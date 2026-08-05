@@ -41,7 +41,8 @@ function actorFromUuid(uuid) {
 function actorFromToken(tokenId, sceneId = null) {
   if (!tokenId) return null;
   const activeSceneId = globalThis.canvas?.scene?.id ?? globalThis.canvas?.scene?._id ?? null;
-  const canvasMatchesScene = !sceneId || !activeSceneId || String(sceneId) === String(activeSceneId);
+  const canvasMatchesScene = !sceneId
+    || (activeSceneId != null && String(sceneId) === String(activeSceneId));
   const canvasToken = canvasMatchesScene ? globalThis.canvas?.tokens?.get?.(tokenId) : null;
   if (isActor(canvasToken?.actor)) return { actor: canvasToken.actor, source: "speaker.token" };
 

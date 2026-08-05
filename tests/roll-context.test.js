@@ -171,3 +171,41 @@ test("matching token ids from different explicit scenes are not treated as the s
     sceneId: "scene-a"
   }).marker, "scene-a");
 });
+
+test("a token message cannot consume a different token context for the same actor", () => {
+  setPendingRollContext({
+    userId: "same-actor-different-token-user",
+    actorId: "actor-a",
+    tokenId: "token-a",
+    sceneId: "scene-a",
+    marker: "token-a"
+  });
+
+  assert.equal(consumePendingRollContext({
+    userId: "same-actor-different-token-user",
+    actorId: "actor-a",
+    tokenId: "token-b",
+    sceneId: "scene-a"
+  }), null);
+  assert.equal(consumePendingRollContext({
+    userId: "same-actor-different-token-user",
+    actorId: "actor-a",
+    tokenId: "token-a",
+    sceneId: "scene-a"
+  }).marker, "token-a");
+});
+
+test("a token message can still match an actor-only context", () => {
+  setPendingRollContext({
+    userId: "actor-only-fallback-user",
+    actorId: "actor-a",
+    marker: "actor-only"
+  });
+
+  assert.equal(consumePendingRollContext({
+    userId: "actor-only-fallback-user",
+    actorId: "actor-a",
+    tokenId: "token-a",
+    sceneId: "scene-a"
+  }).marker, "actor-only");
+});

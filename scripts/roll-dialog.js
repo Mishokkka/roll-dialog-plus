@@ -1169,10 +1169,15 @@ function buildRollContext({
   };
 }
 
-function getDialogSubmissionMetadata({ app, form, actor, rollType, skillKey, selectedAttribute, skillLabel }) {
-  const actorId = actor?.id ?? actor?._id ?? app?.options?.actorId ?? form?.dataset?.actorId ?? null;
-  const tokenId = app?.options?.tokenId ?? app?.speaker?.token ?? form?.dataset?.tokenId ?? actor?.token?.id ?? null;
-  const sceneId = app?.options?.sceneId ?? app?.speaker?.scene ?? form?.dataset?.sceneId ?? actor?.token?.parent?.id ?? null;
+/**
+ * Extracts submission metadata using the same speaker precedence as Actor
+ * resolution, so pending context cannot drift to stale application options.
+ */
+export function getDialogSubmissionMetadata({ app, form, actor, rollType, skillKey, selectedAttribute, skillLabel }) {
+  const speaker = app?.speaker ?? app?.data?.speaker ?? app?.options?.speaker ?? null;
+  const actorId = actor?.id ?? actor?._id ?? speaker?.actor ?? app?.options?.actorId ?? form?.dataset?.actorId ?? null;
+  const tokenId = speaker?.token ?? app?.options?.tokenId ?? form?.dataset?.tokenId ?? actor?.token?.id ?? null;
+  const sceneId = speaker?.scene ?? app?.options?.sceneId ?? form?.dataset?.sceneId ?? actor?.token?.parent?.id ?? null;
   const itemId = app?.gear?.itemId
     ?? app?.gear?.id
     ?? app?.options?.itemId

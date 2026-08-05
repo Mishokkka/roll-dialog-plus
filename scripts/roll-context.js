@@ -108,7 +108,13 @@ function matchingCandidates(queue, metadata) {
   }
 
   if (metadata.actorId) {
-    const exactActor = indexes.filter((index) => sameValue(queue[index].actorId, metadata.actorId));
+    const exactActor = indexes.filter((index) => {
+      const context = queue[index];
+      if (!sameValue(context.actorId, metadata.actorId)) return false;
+      // When the message identifies a token, never consume a context bound to
+      // a different token merely because both tokens share the same base Actor.
+      return !metadata.tokenId || !context.tokenId;
+    });
     if (exactActor.length) return exactActor;
   }
 
