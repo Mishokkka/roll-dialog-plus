@@ -1,4 +1,5 @@
 import { ARTIFACT_DICE } from "./constants.js";
+import { localize } from "./core/i18n.js";
 import { normalizeKey, parseBoolean, parseNumber, slugify } from "./utils.js";
 
 /**
@@ -98,7 +99,7 @@ export function readNativeSystemModifiers(form) {
       id: `native-${stableBase}-${occurrence}`,
       name,
       value,
-      display: gearBonus && !isArtifact ? `Gear ${value > 0 ? `+${value}` : value}` : display,
+      display: gearBonus && !isArtifact ? `${localize("Common.Gear", "Gear")} ${value > 0 ? `+${value}` : value}` : display,
       artifactCounts,
       gearBonus,
       checked: !!input.checked,

@@ -139,6 +139,11 @@ test("quick choices close their panel after selection", async () => {
   assert.match(source, /action === "quick-mod"[\s\S]*callbacks\.onQuick\(button\);[\s\S]*setQuickPanelOpen\(ui, false\);/);
 });
 
+test("removing a Quick counter row resets its stored counter and display", async () => {
+  const source = await readFile(new URL("../scripts/roll-dialog.js", import.meta.url), "utf8");
+  assert.match(source, /modifier\.kind === "counter"[\s\S]*?state\.quickCounters\.delete\(modifier\.groupKey\)[\s\S]*?updateCounterUi\(shell, modifier\.groupKey, 0\)/);
+});
+
 
 test("hidden overlays and footer effects cannot create horizontal scroll ranges", async () => {
   const host = await readFile(path.join(root, "styles/compat/fbl-v13-host.css"), "utf8");

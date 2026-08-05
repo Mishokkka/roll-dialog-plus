@@ -36,6 +36,29 @@ function actorFromUuid(uuid) {
 }
 
 /**
+ * Resolves a token actor on the active canvas or an explicitly named scene.
+ */
+function actorFromToken(tokenId, sceneId = null) {
+  if (!tokenId) return null;
+  const activeSceneId = globalThis.canvas?.scene?.id ?? globalThis.canvas?.scene?._id ?? null;
+  const canvasMatchesScene = !sceneId || !activeSceneId || String(sceneId) === String(activeSceneId);
+  const canvasToken = canvasMatchesScene ? globalThis.canvas?.tokens?.get?.(tokenId) : null;
+  if (isActor(canvasToken?.actor)) return { actor: canvasToken.actor, source: "speaker.token" };
+
+  const scene = sceneId ? globalThis.game?.scenes?.get?.(sceneId) : null;
+  const tokenDocument = scene?.tokens?.get?.(tokenId);
+  if (isActor(tokenDocument?.actor)) return { actor: tokenDocument.actor, source: "scene.token" };
+  return null;
+}
+
+/**
+ * Performs an own-property lookup on data maps that may inherit prototype keys.
+ */
+function hasOwn(object, key) {
+  return object != null && Object.prototype.hasOwnProperty.call(object, key);
+}
+
+/**
  * Resolves the exact Actor associated with a roll application without borrowing unrelated tokens.
  */
 export function resolveActorFromApp(app, form = null) {
@@ -44,21 +67,20 @@ export function resolveActorFromApp(app, form = null) {
   }
 
   const speaker = app?.speaker ?? app?.data?.speaker ?? app?.options?.speaker ?? null;
+  const tokenId = speaker?.token ?? app?.options?.tokenId ?? form?.dataset?.tokenId;
+  const sceneId = speaker?.scene ?? app?.options?.sceneId ?? form?.dataset?.sceneId;
+  const tokenResolution = actorFromToken(tokenId, sceneId);
+  if (tokenResolution) return { ...tokenResolution, approximate: false };
+
+  const actorUuid = app?.options?.actorUuid ?? form?.dataset?.actorUuid;
+  const uuidActor = actorFromUuid(actorUuid);
+  if (uuidActor) return { actor: uuidActor, source: "actor.uuid", approximate: false };
+
   const actorId = speaker?.actor ?? app?.options?.actorId ?? form?.dataset?.actorId;
   if (actorId && globalThis.game?.actors?.get) {
     const actor = game.actors.get(actorId);
     if (isActor(actor)) return { actor, source: "speaker.actor", approximate: false };
   }
-
-  const tokenId = speaker?.token ?? app?.options?.tokenId ?? form?.dataset?.tokenId;
-  if (tokenId && globalThis.canvas?.tokens?.get) {
-    const token = canvas.tokens.get(tokenId);
-    if (isActor(token?.actor)) return { actor: token.actor, source: "speaker.token", approximate: false };
-  }
-
-  const actorUuid = app?.options?.actorUuid ?? form?.dataset?.actorUuid;
-  const uuidActor = actorFromUuid(actorUuid);
-  if (uuidActor) return { actor: uuidActor, source: "actor.uuid", approximate: false };
 
   log.warn("Could not resolve an actor for the roll dialog; using native form values only", {
     app: app?.constructor?.name,
@@ -157,8 +179,8 @@ export function inferSkillKey(actor, skillLabel) {
   if (!normalized) return "";
 
   const skillData = actor?.system?.skill ?? actor?.system?.skills ?? actor?.skills ?? {};
-  if (skillData[normalized]) return normalized;
-  if (SKILL_LABEL_TO_KEY[normalized]) return SKILL_LABEL_TO_KEY[normalized];
+  if (hasOwn(skillData, normalized)) return normalized;
+  if (hasOwn(SKILL_LABEL_TO_KEY, normalized)) return SKILL_LABEL_TO_KEY[normalized];
 
   for (const [key, data] of Object.entries(skillData)) {
     if (normalizeKey(key) === normalized) return key;
@@ -167,7 +189,7 @@ export function inferSkillKey(actor, skillLabel) {
     if (normalizeKey(rawLabel) === normalized || normalizeKey(localized) === normalized) return key;
   }
 
-  return SKILL_LABEL_TO_KEY[normalized] ?? normalized;
+  return hasOwn(SKILL_LABEL_TO_KEY, normalized) ? SKILL_LABEL_TO_KEY[normalized] : normalized;
 }
 
 /**

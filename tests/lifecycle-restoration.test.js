@@ -22,8 +22,35 @@ test("reinstalling lifecycle restoration cleans up the previous patch first", (t
 
   assert.equal(previousCleanupCalls, 1);
   assert.equal(form._fblrpLifecycleCleanup, cleanup);
+  assert.equal(app.__fblrpLifecycleCleanup, cleanup);
   assert.equal(shell.dataset.fblrpLifecycle, "installed");
   assert.deepEqual(registered, ["closeApplication", "closeApplicationV2"]);
   cleanup();
   assert.equal(form._fblrpLifecycleCleanup, undefined);
+  assert.equal(app.__fblrpLifecycleCleanup, undefined);
+});
+
+test("reinstalling on a new form cleans up the previous app lifecycle", (t) => {
+  const previousHooks = globalThis.Hooks;
+  globalThis.Hooks = { on() { return 1; }, off() {} };
+  t.after(() => {
+    if (previousHooks === undefined) delete globalThis.Hooks;
+    else globalThis.Hooks = previousHooks;
+  });
+
+  const app = { close() {} };
+  const firstForm = {};
+  const firstCleanup = installLifecycleRestoration({ app, form: firstForm, shell: { dataset: {} }, bridge: {} });
+  let firstCleanupCalls = 0;
+  app.__fblrpLifecycleCleanup = () => {
+    firstCleanupCalls += 1;
+    firstCleanup();
+  };
+
+  const secondForm = {};
+  const secondCleanup = installLifecycleRestoration({ app, form: secondForm, shell: { dataset: {} }, bridge: {} });
+  assert.equal(firstCleanupCalls, 1);
+  assert.equal(firstForm._fblrpLifecycleCleanup, undefined);
+  assert.equal(app.__fblrpLifecycleCleanup, secondCleanup);
+  secondCleanup();
 });

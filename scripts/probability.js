@@ -8,6 +8,9 @@ const DIE_SUCCESS_DISTRIBUTIONS = Object.freeze({
   d12: [5 / 12, 2 / 12, 2 / 12, 2 / 12, 1 / 12]
 });
 
+/**
+ * Coerces a dice count to a finite non-negative integer.
+ */
 function nonNegativeInteger(value) {
   return Math.max(0, Math.trunc(parseNumber(value, 0)));
 }
@@ -96,7 +99,7 @@ export function calculateChanceAnalysis(payload = {}) {
 }
 
 /**
- * Formats a probability as a localized percentage string.
+ * Formats a probability as a percentage string.
  */
 export function formatChance(chance) {
   const pct = Math.round(clamp01(Number(chance) || 0) * 1000) / 10;
@@ -202,6 +205,9 @@ function bucketDistribution(distribution) {
   };
 }
 
+/**
+ * Restricts a numeric probability to the inclusive zero-to-one range.
+ */
 function clamp01(value) {
   return Math.max(0, Math.min(1, value));
 }

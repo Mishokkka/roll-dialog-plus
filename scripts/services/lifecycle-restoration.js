@@ -5,6 +5,7 @@ import { ROLL_SUBMISSION_TIMEOUT_MS } from "../constants.js";
  * confirmed by a matching ChatMessage. The cleanup function is idempotent.
  */
 export function installLifecycleRestoration({ app, appWindow, form, shell, bridge } = {}) {
+  app?.__fblrpLifecycleCleanup?.();
   form?._fblrpLifecycleCleanup?.();
   let cleaned = false;
   const closeButton = appWindow?.querySelector?.(".header-button.close, [data-action='close']");
@@ -58,9 +59,11 @@ export function installLifecycleRestoration({ app, appWindow, form, shell, bridg
       delete app.__fblrpCloseWrapped;
     }
     if (form?._fblrpLifecycleCleanup === cleanup) delete form._fblrpLifecycleCleanup;
+    if (app?.__fblrpLifecycleCleanup === cleanup) delete app.__fblrpLifecycleCleanup;
   }
 
   if (form) form._fblrpLifecycleCleanup = cleanup;
+  if (app) app.__fblrpLifecycleCleanup = cleanup;
   if (shell?.dataset) shell.dataset.fblrpLifecycle = "installed";
   return cleanup;
 }
