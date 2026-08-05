@@ -1,0 +1,87 @@
+/*
+ * Owner: the native Foundry/FBL application frame only.
+ * Forced declarations are permitted here because system CSS is unscoped and loaded
+ * outside this module. Module-owned component rules live elsewhere.
+ */
+.fblrp-shell-window {
+  width: min(600px, calc(100vw - 18px)) !important;
+  height: auto !important;
+  min-width: min(500px, calc(100vw - 18px)) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 20px) !important;
+  border: 0 !important;
+  border-image: none !important;
+  background: var(--fblrp-window-tint, #ffffff) !important;
+  background-image: none !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell-window::before,
+.fblrp-shell-window::after,
+.fblrp-shell-window > .window-content::before,
+.fblrp-shell-window > .window-content::after,
+.fblrp-shell-window form.roll-dialog.attack-dialog::before,
+.fblrp-shell-window form.roll-dialog.attack-dialog::after {
+  display: none !important;
+  content: none !important;
+  border: 0 !important;
+  border-image: none !important;
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.fblrp-shell-window > .window-content {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-image: none !important;
+  background: var(--fblrp-window-tint, #ffffff) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  transition: background-color 140ms ease;
+}
+
+
+.fblrp-shell-window > .window-header :is(.header-button.close, .header-control[data-action="close"], [data-action="close"]) {
+  display: none !important;
+}
+
+.fblrp-shell-window > .window-header {
+  background: var(--fblrp-window-tint, #ffffff) !important;
+  background-image: none !important;
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell-window form.roll-dialog.attack-dialog {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 54px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+  border: 0 !important;
+  border-image: none !important;
+  background: var(--fblrp-window-tint, #ffffff) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  text-align: left !important;
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell-window .window-resizable-handle,
+.fblrp-shell-window .window-resize-handle,
+.fblrp-shell-window .resize-handle {
+  display: none !important;
+}
+
+.fblrp-native {
+  display: none !important;
+}

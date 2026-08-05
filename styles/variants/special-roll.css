@@ -1,0 +1,61 @@
+/* Owner: Dodge/Parry choice fieldsets and special-roll rows only. */
+.fblrp-shell[data-special-roll] .fblrp-special-choice-groups {
+  display: grid;
+  gap: 1px;
+}
+
+.fblrp-shell[data-special-roll] .fblrp-special-choice {
+  min-inline-size: 0;
+  min-width: 0;
+  margin: 1px 0 0;
+  padding: 2px 3px 3px;
+  border: 1px solid var(--fblrp-border-strong);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-panel-tint, #ffffff);
+}
+
+.fblrp-shell[data-special-roll] .fblrp-special-choice:first-child {
+  margin-top: 0;
+}
+
+.fblrp-shell[data-special-roll] .fblrp-special-choice > legend {
+  padding: 0 4px;
+  color: var(--fblrp-muted);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.fblrp-shell[data-special-roll] .fblrp-special-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+  gap: 3px;
+}
+
+.fblrp-shell[data-special-roll] .fblrp-mod-row.is-special-choice {
+  min-height: 28px;
+  background: var(--fblrp-panel-tint, #ffffff);
+}
+
+.fblrp-shell[data-special-roll] .fblrp-mod-row.is-special-choice .fblrp-mod-label-wrap > span {
+  white-space: normal;
+  line-height: 1.05;
+}
+
+.fblrp-shell[data-special-roll] .fblrp-mod-row.is-special-choice:has(input:checked) {
+  padding: 2px 5px;
+  border: 2px solid var(--fblrp-accent);
+  background: var(--fblrp-accent-soft);
+}
+
+.fblrp-shell[data-special-roll] .fblrp-house-rule {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 4px;
+  border-radius: 999px;
+  background: var(--fblrp-house-soft);
+  color: var(--fblrp-house);
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+}

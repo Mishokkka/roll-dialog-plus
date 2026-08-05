@@ -1,0 +1,120 @@
+import { normalizeKey } from "./utils.js";
+
+const pendingByUser = new Map();
+const TTL_MS = 30_000;
+const MAX_PENDING_PER_USER = 10;
+
+export function setPendingRollContext(context) {
+  const userId = context?.userId ?? globalThis.game?.user?.id ?? "anonymous";
+  const queue = pendingByUser.get(userId) ?? [];
+  const entry = {
+    ...context,
+    nonce: context?.nonce ?? randomId(),
+    userId,
+    createdAt: Date.now()
+  };
+  queue.push(entry);
+  prune(queue);
+  while (queue.length > MAX_PENDING_PER_USER) queue.shift();
+  pendingByUser.set(userId, queue);
+  return entry.nonce;
+}
+
+export function consumePendingRollContext(metadata = {}) {
+  const key = metadata.userId ?? globalThis.game?.user?.id ?? "anonymous";
+  const queue = pendingByUser.get(key);
+  if (!queue?.length) return null;
+  prune(queue);
+  if (!queue.length) {
+    pendingByUser.delete(key);
+    return null;
+  }
+
+  const candidates = actorCandidates(queue, metadata.actorId);
+  if (!candidates.length) return null;
+
+  let best = candidates[0];
+  let bestScore = scoreContext(queue[best], metadata);
+  for (const index of candidates.slice(1)) {
+    const score = scoreContext(queue[index], metadata);
+    if (score > bestScore) {
+      best = index;
+      bestScore = score;
+    }
+  }
+
+  const [context] = queue.splice(best, 1);
+  if (!queue.length) pendingByUser.delete(key);
+  return context ?? null;
+}
+
+export function discardPendingRollContext(nonce, userId = globalThis.game?.user?.id ?? "anonymous") {
+  if (!nonce) return;
+  const queue = pendingByUser.get(userId);
+  if (!queue) return;
+  const index = queue.findIndex((entry) => entry.nonce === nonce);
+  if (index >= 0) queue.splice(index, 1);
+  if (!queue.length) pendingByUser.delete(userId);
+}
+
+export function clearExpiredRollContexts() {
+  for (const [userId, queue] of pendingByUser) {
+    prune(queue);
+    if (!queue.length) pendingByUser.delete(userId);
+  }
+}
+
+export function scorePendingContext(context, metadata = {}) {
+  return scoreContext(context, metadata);
+}
+
+function actorCandidates(queue, actorId) {
+  if (actorId) {
+    const exact = queue.map((_entry, index) => index).filter((index) => sameValue(queue[index].actorId, actorId));
+    if (exact.length) return exact;
+    return queue.map((_entry, index) => index).filter((index) => !queue[index].actorId);
+  }
+  return queue.map((_entry, index) => index).filter((index) => !queue[index].actorId);
+}
+
+function scoreContext(context, metadata) {
+  let score = 0;
+  score += compareField(context.actorId, metadata.actorId, 100, -100);
+  score += compareField(context.tokenId, metadata.tokenId, 35, -12);
+  score += compareField(context.sceneId, metadata.sceneId, 20, -8);
+  score += compareField(context.itemId, metadata.itemId, 30, -15);
+  score += compareField(context.rollType, metadata.rollType, 22, -6);
+  score += compareField(context.skillKey, metadata.skillKey, 18, -4);
+  score += compareField(context.selectedAttribute, metadata.attribute, 18, -5);
+  score += compareField(context.title, metadata.title, 10, -2);
+  return score;
+}
+
+function compareField(left, right, match, mismatch) {
+  if (left == null || left === "" || right == null || right === "") return 0;
+  return sameValue(left, right) ? match : mismatch;
+}
+
+function sameValue(left, right) {
+  const a = comparableValues(left);
+  const b = comparableValues(right);
+  return a.some((value) => b.includes(value));
+}
+
+function comparableValues(value) {
+  const values = Array.isArray(value) ? value : [value];
+  return values
+    .flatMap((entry) => typeof entry === "string" ? entry.split(",") : [entry])
+    .map(normalizeKey)
+    .filter(Boolean);
+}
+
+function prune(queue) {
+  const cutoff = Date.now() - TTL_MS;
+  while (queue.length && queue[0].createdAt < cutoff) queue.shift();
+}
+
+function randomId() {
+  if (globalThis.foundry?.utils?.randomID) return foundry.utils.randomID();
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}

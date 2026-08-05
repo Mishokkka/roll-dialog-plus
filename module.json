@@ -1,0 +1,59 @@
+{
+  "id": "fbl-roll-dialog-plus",
+  "title": "FBL Roll Dialog Plus",
+  "description": "A compact roll manager for Forbidden Lands with Dodge and Parry profiles, quick modifiers and GM-only probability analysis.",
+  "version": "0.7.0",
+  "authors": [
+    {
+      "name": "Foundry JS"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13.351",
+    "verified": "13.351",
+    "maximum": "13"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "forbidden-lands",
+        "type": "system",
+        "compatibility": {
+          "minimum": "13.0.5",
+          "verified": "13.0.5",
+          "maximum": "13.0.5"
+        }
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/tokens.css",
+    "styles/compat/fbl-v13-host.css",
+    "styles/components/shell.css",
+    "styles/components/attribute-strip.css",
+    "styles/components/dice-pool.css",
+    "styles/components/modifier-list.css",
+    "styles/components/footer.css",
+    "styles/components/quick-panel.css",
+    "styles/components/chance-panel.css",
+    "styles/variants/special-roll.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "ru",
+      "name": "Русский",
+      "path": "lang/ru.json"
+    }
+  ],
+  "readme": "README.md",
+  "license": "LICENSE",
+  "changelog": "CHANGELOG.md"
+}

@@ -1,0 +1,112 @@
+/* Owner: base, skill, gear and artifact dice controls. */
+.fblrp-shell .fblrp-dice-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--fblrp-space-2);
+  min-height: 34px;
+  border-top: 1px solid var(--fblrp-border);
+}
+
+.fblrp-shell .fblrp-dice-row:first-of-type {
+  border-top: 0;
+}
+
+.fblrp-shell .fblrp-dice-row > label {
+  min-width: 0;
+  overflow: hidden;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fblrp-shell .fblrp-stepper {
+  display: grid;
+  grid-template-columns: 27px 40px 27px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--fblrp-border-strong);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-surface-1);
+}
+
+.fblrp-shell .fblrp-stepper button {
+  width: 27px;
+  height: 27px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--fblrp-surface-2);
+  cursor: pointer;
+}
+
+.fblrp-shell .fblrp-stepper input,
+.fblrp-shell .fblrp-artifact-die input {
+  width: 100%;
+  height: 27px;
+  margin: 0;
+  padding: 0 3px;
+  border: 0;
+  background: transparent;
+  color: var(--fblrp-text);
+  font-family: inherit;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: none;
+}
+
+.fblrp-shell .fblrp-stepper input::-webkit-inner-spin-button,
+.fblrp-shell .fblrp-artifact-die input::-webkit-inner-spin-button {
+  appearance: none;
+}
+
+.fblrp-shell .fblrp-artifacts {
+  margin-top: 5px;
+  padding-top: 6px;
+  border-top: 1px solid var(--fblrp-border);
+}
+
+.fblrp-shell .fblrp-artifacts-label {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.fblrp-shell .fblrp-artifact-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.fblrp-shell .fblrp-artifact-die {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-surface-2);
+}
+
+.fblrp-shell .fblrp-artifact-die.is-active {
+  border-color: var(--fblrp-accent);
+  background: var(--fblrp-accent-soft);
+}
+
+.fblrp-shell .fblrp-die-icon {
+  display: grid;
+  place-items: center;
+  height: 28px;
+  border-right: 1px solid var(--fblrp-border);
+  color: var(--fblrp-accent);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+}

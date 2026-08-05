@@ -1,0 +1,110 @@
+/* Owner: root shell, generic sections and responsive column layout. */
+.fblrp-shell,
+.fblrp-shell * {
+  box-sizing: border-box;
+}
+
+.fblrp-shell {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  min-height: 0;
+  padding: 7px;
+  overflow: hidden;
+  background: var(--fblrp-window-tint, var(--fblrp-surface-0));
+  color: var(--fblrp-text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.18;
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell :is(button, input) {
+  font: inherit;
+}
+
+.fblrp-shell button {
+  color: inherit;
+}
+
+.fblrp-shell :is(button, input):focus-visible {
+  outline: 2px solid var(--fblrp-accent);
+  outline-offset: 1px;
+  box-shadow: var(--fblrp-focus);
+}
+
+.fblrp-shell button:disabled,
+.fblrp-shell .is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.fblrp-shell.is-submitting {
+  cursor: progress;
+}
+
+.fblrp-shell .fblrp-section {
+  padding: 7px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-md);
+  background: var(--fblrp-panel-tint, #ffffff);
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell .fblrp-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fblrp-space-2);
+  min-height: 26px;
+  margin: -2px 0 3px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.fblrp-shell .fblrp-two-columns {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(0, 1.3fr);
+  gap: 5px;
+  align-items: start;
+}
+
+.fblrp-shell .fblrp-zero-warning {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: var(--fblrp-space-2);
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--fblrp-warning) 40%, transparent);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-warning-soft);
+  color: var(--fblrp-warning);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fblrp-shell .is-hidden {
+  display: none;
+}
+
+@container (max-width: 610px) {
+  .fblrp-shell .fblrp-two-columns {
+    grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.3fr);
+  }
+}
+
+@container (max-width: 545px) {
+  .fblrp-shell .fblrp-two-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container (max-width: 410px) {
+  .fblrp-shell {
+    padding: 6px;
+  }
+}
