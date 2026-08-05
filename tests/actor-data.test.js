@@ -168,3 +168,28 @@ test("an explicitly named off-canvas scene is not confused with the active canva
   assert.equal(resolution.actor, sceneActor);
   assert.equal(resolution.source, "scene.token");
 });
+
+test("an explicit scene never trusts a canvas token when canvas.scene is unavailable", (t) => {
+  restoreGlobal(t, "canvas");
+  restoreGlobal(t, "game");
+  const canvasActor = { documentName: "Actor", id: "canvas-actor" };
+  const sceneActor = { documentName: "Actor", id: "scene-actor" };
+  globalThis.canvas = {
+    scene: null,
+    tokens: { get(id) { return id === "shared-token-id" ? { actor: canvasActor } : null; } }
+  };
+  globalThis.game = {
+    scenes: {
+      get(id) {
+        return id === "scene-requested"
+          ? { tokens: { get(tokenId) { return tokenId === "shared-token-id" ? { actor: sceneActor } : null; } } }
+          : null;
+      }
+    },
+    actors: { get() { return null; } }
+  };
+
+  const resolution = resolveActorFromApp({ speaker: { scene: "scene-requested", token: "shared-token-id" } }, { dataset: {} });
+  assert.equal(resolution.actor, sceneActor);
+  assert.equal(resolution.source, "scene.token");
+});

@@ -117,3 +117,23 @@ test("a native false result unlocks the dialog and discards pending context", (t
   assert.deepEqual(calls, []);
   assert.equal(consumePendingRollContext({ userId: "submit-false", actorId: "actor-false" }), null);
 });
+
+test("submission metadata prefers the resolved speaker over stale option token data", async (t) => {
+  const { getDialogSubmissionMetadata } = await import("../scripts/roll-dialog.js");
+  const metadata = getDialogSubmissionMetadata({
+    app: {
+      data: { speaker: { actor: "speaker-actor", token: "speaker-token", scene: "speaker-scene" } },
+      options: { actorId: "option-actor", tokenId: "option-token", sceneId: "option-scene" }
+    },
+    form: { dataset: {} },
+    actor: null,
+    rollType: "skill",
+    skillKey: "move",
+    selectedAttribute: { key: "agility" },
+    skillLabel: "Move"
+  });
+
+  assert.equal(metadata.actorId, "speaker-actor");
+  assert.equal(metadata.tokenId, "speaker-token");
+  assert.equal(metadata.sceneId, "speaker-scene");
+});
