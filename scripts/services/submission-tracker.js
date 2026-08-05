@@ -1,10 +1,12 @@
+import { ROLL_SUBMISSION_TIMEOUT_MS } from "../constants.js";
 import { localize } from "../core/i18n.js";
 import { log } from "../core/logging.js";
 import { discardPendingRollContext } from "../roll-context.js";
 
-export const SUBMISSION_TIMEOUT_MS = 30_000;
-
-export function armSubmissionTracking({ state, bridge, shell, nonce, onUnlock = null, timeoutMs = SUBMISSION_TIMEOUT_MS } = {}) {
+/**
+ * Tracks a native submission until matching chat context confirms or times out.
+ */
+export function armSubmissionTracking({ state, bridge, shell, nonce, onUnlock = null, timeoutMs = ROLL_SUBMISSION_TIMEOUT_MS } = {}) {
   let active = true;
   let hookId = null;
   let timeoutId = null;

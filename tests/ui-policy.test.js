@@ -201,7 +201,7 @@ test("reset, last quick setup and native header close are removed", async () => 
   assert.match(host, /window-header[\s\S]*data-action="close"[\s\S]*display:\s*none\s*!important/);
 });
 
-test("attribute tints are slightly stronger in 0.6.7", async () => {
+test("attribute tints retain the reviewed contrast in 0.7.1", async () => {
   const tokens = await readFile(path.join(root, "styles/tokens.css"), "utf8");
   assert.match(tokens, /data-selected-attr="strength"[\s\S]*--fblrp-window-tint:\s*#f6dddd/);
   assert.match(tokens, /data-selected-attr="agility"[\s\S]*--fblrp-window-tint:\s*#dff1e4/);

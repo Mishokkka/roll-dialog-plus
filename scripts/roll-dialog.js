@@ -21,6 +21,9 @@ const PROBABILITY_PREVIEW_LIMIT = 200;
 const PROBABILITY_CACHE_LIMIT = 120;
 const probabilityAnalysisCache = new Map();
 
+/**
+ * Checks whether an application render belongs to a supported Forbidden Lands roll dialog.
+ */
 export function isTargetRollDialog(app, html) {
   if (globalThis.game?.system?.id && game.system.id !== SYSTEM_ID) return false;
   const root = toHTMLElement(html);
@@ -42,6 +45,9 @@ export function isTargetRollDialog(app, html) {
   return true;
 }
 
+/**
+ * Transactionally replaces a supported native roll form with the module shell.
+ */
 export function patchRollDialog(app, html) {
   if (!getSetting(SETTINGS.ENABLED, true) || !isTargetRollDialog(app, html)) return;
 
@@ -417,6 +423,8 @@ function setupSkillShell({
     state,
     shell,
     ui,
+    bridge,
+    renderArtifactDice,
     armorMode: false,
     updateTotals,
     customLabelKey: "Modifiers.CustomDefault",
@@ -509,25 +517,13 @@ function setupSkillShell({
     ui,
     state,
     bridge,
-    onStep(target, delta) {
-      const input = ui.input(target);
-      if (!input) return;
-      input.value = Math.max(0, parseNumber(input.value, 0) + delta);
-      updateTotals();
-    },
+    onStep: shared.onStep,
     onQuick: shared.toggleQuickModifier,
     onCounter: shared.stepQuickCounter,
-    onAddCustom: shared.addCustomModifier,
-    onCalculateChance() {
-      if (!state.canUseChance) return;
-      state.chanceRevealed = !state.chanceRevealed;
-      if (state.chanceRevealed) updateTotals({ revealChance: true });
-      else {
-        hideChancePanel(ui);
-      }
-    },
+    onAddCustom: shared.onAddCustom,
+    onCalculateChance: shared.onCalculateChance,
     onRoll: doRoll,
-    onCancel: () => bridge.cancel(),
+    onCancel: shared.onCancel,
     onSelectAttribute: selectAttribute,
     onNativeModifier(id, checked) {
       const modifier = state.nativeSystemModifiers.find((entry) => entry.id === id);
@@ -545,26 +541,10 @@ function setupSkillShell({
       }
       updateTotals();
     },
-    onCustomModifier(id, field, value) {
-      const modifier = state.customModifiers.get(id);
-      if (!modifier) return;
-      if (field === "label" && modifier.origin === "custom") {
-        modifier.label = String(value ?? "").trim() || localize("Modifiers.CustomDefault", "Custom modifier");
-        return;
-      }
-      if (field === "active") modifier.active = !!value;
-      else if (field === "value") modifier.value = parseNumber(value, 0);
-      updateTotals();
-    },
-    onRemoveCustom: shared.removeCustomModifier,
-    onArtifactInput() {
-      state.manualArtifactCounts = readArtifacts(shell);
-      renderArtifactDice();
-      updateTotals();
-    },
-    onDiceInput() {
-      updateTotals();
-    }
+    onCustomModifier: shared.onCustomModifier,
+    onRemoveCustom: shared.onRemoveCustom,
+    onArtifactInput: shared.onArtifactInput,
+    onDiceInput: shared.onDiceInput
   });
 
   shell._fblrpCancelProbability = () => cancelScheduledProbability(state);
@@ -695,6 +675,8 @@ function setupArmorShell({
     state,
     shell,
     ui,
+    bridge,
+    renderArtifactDice,
     armorMode: true,
     updateTotals,
     customLabelKey: "Armor.CustomDefault",
@@ -742,25 +724,13 @@ function setupArmorShell({
     ui,
     state,
     bridge,
-    onStep(target, delta) {
-      const input = ui.input(target);
-      if (!input) return;
-      input.value = Math.max(0, parseNumber(input.value, 0) + delta);
-      updateTotals();
-    },
+    onStep: shared.onStep,
     onQuick: shared.toggleQuickModifier,
     onCounter: shared.stepQuickCounter,
-    onAddCustom: shared.addCustomModifier,
-    onCalculateChance() {
-      if (!state.canUseChance) return;
-      state.chanceRevealed = !state.chanceRevealed;
-      if (state.chanceRevealed) updateTotals({ revealChance: true });
-      else {
-        hideChancePanel(ui);
-      }
-    },
+    onAddCustom: shared.onAddCustom,
+    onCalculateChance: shared.onCalculateChance,
     onRoll: doRoll,
-    onCancel: () => bridge.cancel(),
+    onCancel: shared.onCancel,
     onSelectAttribute: () => {},
     onNativeModifier(id, checked) {
       const modifier = state.nativeSystemModifiers.find((entry) => entry.id === id);
@@ -769,33 +739,17 @@ function setupArmorShell({
       bridge.syncModifierCheckbox(modifier);
       updateTotals();
     },
-    onCustomModifier(id, field, value) {
-      const modifier = state.customModifiers.get(id);
-      if (!modifier) return;
-      if (field === "label" && modifier.origin === "custom") {
-        modifier.label = String(value ?? "").trim() || localize("Armor.CustomDefault", "Armor adjustment");
-        return;
-      }
-      if (field === "active") modifier.active = !!value;
-      else if (field === "value") modifier.value = parseNumber(value, 0);
-      updateTotals();
-    },
-    onRemoveCustom: shared.removeCustomModifier,
-    onArtifactInput() {
-      state.manualArtifactCounts = readArtifacts(shell);
-      renderArtifactDice();
-      updateTotals();
-    },
-    onDiceInput() {
-      updateTotals();
-    }
+    onCustomModifier: shared.onCustomModifier,
+    onRemoveCustom: shared.onRemoveCustom,
+    onArtifactInput: shared.onArtifactInput,
+    onDiceInput: shared.onDiceInput
   });
 
   shell._fblrpCancelProbability = () => cancelScheduledProbability(state);
   updateTotals();
 }
 
-function createSharedRollController({ state, shell, ui, armorMode, updateTotals, customLabelKey, customLabelFallback }) {
+function createSharedRollController({ state, shell, ui, bridge, renderArtifactDice, armorMode, updateTotals, customLabelKey, customLabelFallback }) {
   function renderCustomModifiers() {
     renderCustomModifierList(ui.el('[data-list="custom-modifiers"]'), state.customModifiers);
   }
@@ -860,12 +814,50 @@ function createSharedRollController({ state, shell, ui, armorMode, updateTotals,
     updateTotals();
   }
 
+  function onStep(target, delta) {
+    const input = ui.input(target);
+    if (!input) return;
+    input.value = Math.max(0, parseNumber(input.value, 0) + delta);
+    updateTotals();
+  }
+
+  function onCalculateChance() {
+    if (!state.canUseChance) return;
+    state.chanceRevealed = !state.chanceRevealed;
+    if (state.chanceRevealed) updateTotals({ revealChance: true });
+    else hideChancePanel(ui);
+  }
+
+  function onCustomModifier(id, field, value) {
+    const modifier = state.customModifiers.get(id);
+    if (!modifier) return;
+    if (field === "label" && modifier.origin === "custom") {
+      modifier.label = String(value ?? "").trim() || localize(customLabelKey, customLabelFallback);
+      return;
+    }
+    if (field === "active") modifier.active = !!value;
+    else if (field === "value") modifier.value = parseNumber(value, 0);
+    updateTotals();
+  }
+
+  function onArtifactInput() {
+    state.manualArtifactCounts = readArtifacts(shell);
+    renderArtifactDice();
+    updateTotals();
+  }
+
   return {
     renderCustomModifiers,
-    addCustomModifier,
     toggleQuickModifier,
     stepQuickCounter,
-    removeCustomModifier
+    onStep,
+    onAddCustom: addCustomModifier,
+    onCalculateChance,
+    onCancel: () => bridge.cancel(),
+    onCustomModifier,
+    onRemoveCustom: removeCustomModifier,
+    onArtifactInput,
+    onDiceInput: () => updateTotals()
   };
 }
 
@@ -969,7 +961,10 @@ function installCommonEvents(callbacks) {
       callbacks.onRoll(event);
     }
   });
-  updateCounterUi(shell, "help", parseNumber(state.quickCounters?.get?.("help"), 0));
+  for (const group of state.quickGroups ?? []) {
+    if (group.mode !== "counter") continue;
+    updateCounterUi(shell, group.key, parseNumber(state.quickCounters?.get?.(group.key), 0));
+  }
 }
 
 function createUi(shell) {

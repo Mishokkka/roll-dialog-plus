@@ -79,32 +79,86 @@ setTimeout(() => {
 </script></body></html>`);
 
 try {
+  const pythonBin = resolvePythonInterpreter();
+  if (!pythonBin) {
+    console.log("Browser smoke skipped: no Python interpreter found (set FBLRP_PYTHON to override).");
+    process.exitCode = 0;
+  } else if (!hasPythonPlaywright(pythonBin)) {
+    console.log(`Browser smoke skipped: Python Playwright is unavailable for '${pythonBin}'.`);
+    process.exitCode = 0;
+  } else {
+    const chromiumPath = process.env.FBLRP_CHROMIUM ?? "";
   const python = String.raw`
 import json, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 html = Path(sys.argv[1]).read_text(encoding="utf8")
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True, executable_path="/usr/bin/chromium", args=["--no-sandbox", "--disable-dev-shm-usage"])
+    launch = {"headless": True, "args": ["--no-sandbox", "--disable-dev-shm-usage"]}
+    if len(sys.argv) > 2 and sys.argv[2]:
+        launch["executable_path"] = sys.argv[2]
+    try:
+        browser = p.chromium.launch(**launch)
+    except Exception as error:
+        print(f"FBLRP_SMOKE_SKIP: {error}", file=sys.stderr)
+        raise SystemExit(77)
     page = browser.new_page(viewport={"width": 900, "height": 700})
     page.set_content(html, wait_until="load")
     page.wait_for_function("document.querySelector('#smoke-result')?.dataset?.json")
     print(page.locator("#smoke-result").get_attribute("data-json"))
     browser.close()
 `;
-  const result = JSON.parse(execFileSync("python", ["-c", python, htmlPath], {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-    timeout: 30_000
-  }).trim());
-  assert.notEqual(result.background, "rgb(255, 255, 255)");
-  assert.notEqual(result.shellBackground, "rgb(255, 255, 255)");
-  assert.ok(result.width <= 600.5, `window is too wide: ${result.width}`);
-  assert.equal(result.noOverflow, true);
-  assert.equal(result.rollCentered, true);
-  assert.equal(result.quickClosed, true);
-  assert.notEqual(result.activeBorder, "rgba(0, 0, 0, 0)");
-  console.log(`Browser smoke passed: ${JSON.stringify(result)}`);
+    let output;
+    try {
+      output = execFileSync(pythonBin, ["-c", python, htmlPath, chromiumPath], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+        timeout: 30_000
+      });
+    } catch (error) {
+      if (error?.status === 77 || String(error?.stderr ?? "").includes("FBLRP_SMOKE_SKIP:")) {
+        console.log("Browser smoke skipped: Chromium is unavailable (set FBLRP_CHROMIUM to an installed executable).");
+        process.exitCode = 0;
+        output = null;
+      } else {
+        throw error;
+      }
+    }
+
+    if (output != null) {
+      const result = JSON.parse(output.trim());
+      assert.notEqual(result.background, "rgb(255, 255, 255)");
+      assert.notEqual(result.shellBackground, "rgb(255, 255, 255)");
+      assert.ok(result.width <= 600.5, `window is too wide: ${result.width}`);
+      assert.equal(result.noOverflow, true);
+      assert.equal(result.rollCentered, true);
+      assert.equal(result.quickClosed, true);
+      assert.notEqual(result.activeBorder, "rgba(0, 0, 0, 0)");
+      console.log(`Browser smoke passed: ${JSON.stringify(result)}`);
+    }
+  }
 } finally {
   rmSync(tempDir, { recursive: true, force: true });
+}
+
+function resolvePythonInterpreter() {
+  const candidates = [process.env.FBLRP_PYTHON, "python3", "python"].filter(Boolean);
+  for (const candidate of [...new Set(candidates)]) {
+    try {
+      execFileSync(candidate, ["-c", "import sys"], { stdio: "ignore", timeout: 5_000 });
+      return candidate;
+    } catch (_error) {
+      // Try the next configured or conventional interpreter name.
+    }
+  }
+  return null;
+}
+
+function hasPythonPlaywright(pythonBin) {
+  try {
+    execFileSync(pythonBin, ["-c", "from playwright.sync_api import sync_playwright"], { stdio: "ignore", timeout: 5_000 });
+    return true;
+  } catch (_error) {
+    return false;
+  }
 }

@@ -1,6 +1,9 @@
 import { ARTIFACT_DICE } from "./constants.js";
 import { normalizeKey, parseBoolean, parseNumber, slugify } from "./utils.js";
 
+/**
+ * Extracts D8, D10, and D12 artifact-die counts from modifier values.
+ */
 export function artifactCountsFromValues(...values) {
   const counts = { d8: 0, d10: 0, d12: 0 };
   for (const value of values) {
@@ -10,6 +13,9 @@ export function artifactCountsFromValues(...values) {
   return counts;
 }
 
+/**
+ * Formats artifact-die counts for display in the roll dialog.
+ */
 export function formatArtifactCounts(counts) {
   const parts = [];
   for (const die of ARTIFACT_DICE) {
@@ -21,6 +27,9 @@ export function formatArtifactCounts(counts) {
 }
 
 
+/**
+ * Removes artifact-die fragments from a modifier label.
+ */
 export function cleanModifierName(value, artifactCounts = {}) {
   let name = String(value ?? "").replace(/\s+/g, " ").trim();
   const hasArtifacts = ARTIFACT_DICE.some((die) => parseNumber(artifactCounts?.[die], 0) > 0);
@@ -38,12 +47,18 @@ export function cleanModifierName(value, artifactCounts = {}) {
   return name.replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Adds two artifact-die count objects without mutating either input.
+ */
 export function addArtifactCounts(a = {}, b = {}) {
   const counts = { d8: 0, d10: 0, d12: 0 };
   for (const die of ARTIFACT_DICE) counts[die] = Math.max(0, parseNumber(a?.[die], 0)) + Math.max(0, parseNumber(b?.[die], 0));
   return counts;
 }
 
+/**
+ * Reads and normalizes native Forbidden Lands modifier controls from a form.
+ */
 export function readNativeSystemModifiers(form) {
   const optionInputs = [...form.querySelectorAll(".options input[type='checkbox']")];
   const inputs = optionInputs.length
@@ -102,6 +117,9 @@ export function readNativeSystemModifiers(form) {
   return rows;
 }
 
+/**
+ * Merges DOM and Actor modifier sources while preserving stable identity and selection.
+ */
 export function mergeSystemModifiers(domModifiers = [], actorModifiers = [], previous = []) {
   const previousState = buildCheckState(previous);
   const output = domModifiers.map(cloneModifier);
@@ -144,6 +162,9 @@ export function mergeSystemModifiers(domModifiers = [], actorModifiers = [], pre
   return deduplicateSystemModifiers(output);
 }
 
+/**
+ * Collapses duplicate normalized system modifiers.
+ */
 export function deduplicateSystemModifiers(modifiers = []) {
   const output = [];
   const seen = new Map();
@@ -186,6 +207,9 @@ export function deduplicateSystemModifiers(modifiers = []) {
   return output;
 }
 
+/**
+ * Builds the strongest stable identity available for a modifier.
+ */
 export function modifierIdentity(modifier) {
   if (modifier?.specialRoll && modifier?.id) return `special:${modifier.id}`;
   const source = modifierSourceKey(modifier);
@@ -194,6 +218,9 @@ export function modifierIdentity(modifier) {
   return `compat:${modifierCompatibilityKey(modifier)}`;
 }
 
+/**
+ * Builds a compatibility key used when stable source identity is unavailable.
+ */
 export function modifierCompatibilityKey(modifier) {
   const artifactCounts = { d8: 0, d10: 0, d12: 0, ...(modifier?.artifactCounts ?? {}) };
   const artifacts = ARTIFACT_DICE.map((die) => `${die}:${parseNumber(artifactCounts[die], 0)}`).join("|");
@@ -201,6 +228,9 @@ export function modifierCompatibilityKey(modifier) {
   return [normalizeKey(comparableName), parseNumber(modifier?.value, 0), modifier?.gearBonus ? 1 : 0, artifacts].join("::");
 }
 
+/**
+ * Sums active numeric modifiers, optionally limiting the calculation to DOM entries.
+ */
 export function activeNumericModifierSum(modifiers = [], { domOnly = false } = {}) {
   return modifiers.reduce((sum, modifier) => {
     if (!modifier?.checked || modifier?.gearBonus || hasModifierArtifacts(modifier)) return sum;
@@ -210,6 +240,9 @@ export function activeNumericModifierSum(modifiers = [], { domOnly = false } = {
   }, 0);
 }
 
+/**
+ * Combines artifact dice supplied by active modifiers.
+ */
 export function activeArtifactModifierCounts(modifiers = []) {
   return (modifiers ?? []).reduce(
     (counts, modifier) => modifier?.checked ? addArtifactCounts(counts, modifier.artifactCounts) : counts,
@@ -217,10 +250,16 @@ export function activeArtifactModifierCounts(modifiers = []) {
   );
 }
 
+/**
+ * Calculates the native modifier value not represented by normalized options.
+ */
 export function calculateModifierResidual(initialModifierValue, modifiers = []) {
   return parseNumber(initialModifierValue, 0) - activeNumericModifierSum(modifiers, { domOnly: true });
 }
 
+/**
+ * Parses a native artifact-dice field into D8, D10, and D12 counts.
+ */
 export function parseArtifactDice(value) {
   const counts = { d8: 0, d10: 0, d12: 0 };
   const text = String(value ?? "").toLowerCase();
@@ -234,6 +273,9 @@ export function parseArtifactDice(value) {
   return counts;
 }
 
+/**
+ * Serializes artifact-die counts for the native Forbidden Lands form field.
+ */
 export function buildArtifactValue(counts) {
   const dice = [];
   for (const die of ARTIFACT_DICE) {

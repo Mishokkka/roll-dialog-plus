@@ -1,5 +1,5 @@
 import { ATTRIBUTES, SKILL_LABEL_TO_KEY } from "./constants.js";
-import { attributeLabel } from "./core/i18n.js";
+import { attributeLabel, localize } from "./core/i18n.js";
 import { log } from "./core/logging.js";
 import { artifactCountsFromValues, formatArtifactCounts } from "./modifiers.js";
 import { firstNumber, getPropertySafe, normalizeKey, parseBoolean, parseNumber, slugify } from "./utils.js";
@@ -35,6 +35,9 @@ function actorFromUuid(uuid) {
   return null;
 }
 
+/**
+ * Resolves the exact Actor associated with a roll application without borrowing unrelated tokens.
+ */
 export function resolveActorFromApp(app, form = null) {
   for (const [candidate, source] of explicitActorCandidates(app)) {
     if (isActor(candidate)) return { actor: candidate, source, approximate: false };
@@ -67,6 +70,9 @@ export function resolveActorFromApp(app, form = null) {
   return { actor: null, source: "unresolved", approximate: false, unresolved: true };
 }
 
+/**
+ * Reads normalized attribute values from supported Actor data layouts.
+ */
 export function getActorAttributeValues(actor, currentLabel, currentValue, currentKey = null) {
   const system = actor?.system ?? {};
   const values = {};
@@ -93,16 +99,32 @@ export function getActorAttributeValues(actor, currentLabel, currentValue, curre
   return values;
 }
 
+/**
+ * Infers an attribute key from an exact or localized label, then from safe substring aliases.
+ */
 export function inferCurrentAttribute(baseLabel) {
   const normalized = normalizeKey(baseLabel);
   if (!normalized) return null;
-  for (const attr of ATTRIBUTES) {
-    const aliases = [attr.key, attr.fallback, attributeLabel(attr), ...(attr.aliases ?? [])].map(normalizeKey);
-    if (aliases.some((alias) => alias && (normalized === alias || normalized.includes(alias)))) return attr.key;
+
+  const aliasesByAttribute = ATTRIBUTES.map((attr) => [
+    attr.key,
+    [attr.key, attr.fallback, attributeLabel(attr), ...(attr.aliases ?? [])]
+      .map(normalizeKey)
+      .filter(Boolean)
+  ]);
+
+  for (const [key, aliases] of aliasesByAttribute) {
+    if (aliases.includes(normalized)) return key;
+  }
+  for (const [key, aliases] of aliasesByAttribute) {
+    if (aliases.some((alias) => normalized.includes(alias))) return key;
   }
   return null;
 }
 
+/**
+ * Resolves the current attribute from explicit roll data before consulting labels.
+ */
 export function resolveCurrentAttributeKey(app, form = null, baseLabel = "") {
   const explicit = [
     app?.base?.name,
@@ -127,6 +149,9 @@ export function resolveCurrentAttributeKey(app, form = null, baseLabel = "") {
   return inferCurrentAttribute(baseLabel);
 }
 
+/**
+ * Resolves a skill key from Actor data and localized skill labels.
+ */
 export function inferSkillKey(actor, skillLabel) {
   const normalized = normalizeKey(skillLabel);
   if (!normalized) return "";
@@ -145,10 +170,16 @@ export function inferSkillKey(actor, skillLabel) {
   return SKILL_LABEL_TO_KEY[normalized] ?? normalized;
 }
 
+/**
+ * Reads Actor roll modifiers for a skill and attribute pair.
+ */
 export function readActorRollModifiers(actor, skillKey, attrKey, fallback = []) {
   return readActorRollModifiersByIdentifiers(actor, [skillKey, attrKey], fallback);
 }
 
+/**
+ * Reads and normalizes Actor roll modifiers for an ordered identifier set.
+ */
 export function readActorRollModifiersByIdentifiers(actor, identifiers = [], fallback = []) {
   if (!actor || typeof actor.getRollModifierOptions !== "function") return fallback;
   identifiers = [...new Set((identifiers ?? []).filter(Boolean))];
@@ -192,7 +223,9 @@ export function readActorRollModifiersByIdentifiers(actor, identifiers = [], fal
       id: `actor-${slugify(stableToken)}-${index}`,
       name,
       value: numericValue,
-      display: gearBonus && !hasArtifacts ? `Gear ${numericValue > 0 ? `+${numericValue}` : numericValue}` : (hasArtifacts ? formatArtifactCounts(artifactCounts) : undefined),
+      display: gearBonus && !hasArtifacts
+        ? `${localize("Common.Gear", "Gear")} ${numericValue > 0 ? `+${numericValue}` : numericValue}`
+        : (hasArtifacts ? formatArtifactCounts(artifactCounts) : undefined),
       artifactCounts,
       gearBonus,
       checked: mod.active !== false,

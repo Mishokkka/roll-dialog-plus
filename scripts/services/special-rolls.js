@@ -155,21 +155,33 @@ const profiles = new Map([
   [PARRY_PROFILE.key, clone(PARRY_PROFILE)]
 ]);
 
+/**
+ * Returns a registered special-roll profile by key.
+ */
 export function getSpecialRollProfile(key) {
   const profile = profiles.get(String(key ?? ""));
   return profile ? clone(profile) : null;
 }
 
+/**
+ * Returns isolated copies of every registered special-roll profile.
+ */
 export function listSpecialRollProfiles() {
   return [...profiles.values()].map(clone);
 }
 
+/**
+ * Registers or replaces a special-roll profile.
+ */
 export function registerSpecialRollProfile(profile, { replace = false } = {}) {
   if (!profile?.key) throw new Error("Special roll profile requires a key");
   if (profiles.has(profile.key) && !replace) throw new Error(`Special roll profile '${profile.key}' is already registered`);
   profiles.set(profile.key, clone(profile));
 }
 
+/**
+ * Resolves the matching special-roll profile for the current native dialog.
+ */
 export function resolveSpecialRollProfile({ app = null, form = null, title = "", skillKey = "", nativeModifiers = [] } = {}) {
   const normalizedSkill = normalizeKey(skillKey);
   const candidates = [
@@ -207,6 +219,9 @@ export function resolveSpecialRollProfile({ app = null, form = null, title = "",
   return null;
 }
 
+/**
+ * Builds the serializable view model for a special-roll profile.
+ */
 export function getSpecialRollView(profile) {
   if (!profile) return null;
   return {
@@ -217,6 +232,9 @@ export function getSpecialRollView(profile) {
   };
 }
 
+/**
+ * Builds ordered Actor modifier identifiers for a special or regular roll.
+ */
 export function buildRollIdentifiers(profile, skillKey, attrKey, { app = null, form = null } = {}) {
   const identifiers = [profile?.key, skillKey, attrKey];
   if (profile?.includeGearItemId) {
@@ -231,6 +249,9 @@ export function buildRollIdentifiers(profile, skillKey, attrKey, { app = null, f
   return [...new Set(identifiers.filter(Boolean))];
 }
 
+/**
+ * Applies a special-roll profile while preserving compatible prior selections.
+ */
 export function applySpecialRollProfile(modifiers = [], profile = null, previous = []) {
   if (!profile) return modifiers.map(cloneModifier);
 
@@ -287,6 +308,9 @@ export function applySpecialRollProfile(modifiers = [], profile = null, previous
   return [...special, ...ordinary];
 }
 
+/**
+ * Partitions normalized modifiers into special and regular collections.
+ */
 export function partitionSpecialModifiers(modifiers = []) {
   return {
     special: modifiers.filter((modifier) => modifier?.specialRoll),

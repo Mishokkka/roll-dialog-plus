@@ -31,7 +31,7 @@
 
 .fblrp-shell .fblrp-chance-metrics {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
   gap: 5px;
   margin-top: 5px;
 }
@@ -70,10 +70,4 @@
 
 .fblrp-shell .fblrp-probability-limit {
   grid-column: 1 / -1;
-}
-
-@container (max-width: 620px) {
-  .fblrp-shell .fblrp-chance-metrics {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }

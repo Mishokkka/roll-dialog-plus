@@ -2,7 +2,7 @@
   "id": "fbl-roll-dialog-plus",
   "title": "FBL Roll Dialog Plus",
   "description": "A compact roll manager for Forbidden Lands with Dodge and Parry profiles, quick modifiers and GM-only probability analysis.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "authors": [
     {
       "name": "Foundry JS"
@@ -54,6 +54,5 @@
     }
   ],
   "readme": "README.md",
-  "license": "LICENSE",
   "changelog": "CHANGELOG.md"
 }

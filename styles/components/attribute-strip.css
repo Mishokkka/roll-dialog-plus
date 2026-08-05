@@ -35,6 +35,11 @@
   background: var(--fblrp-surface-2);
 }
 
+.fblrp-shell .fblrp-attr-card:focus-visible {
+  outline: 3px solid var(--fblrp-accent);
+  outline-offset: 2px;
+}
+
 .fblrp-shell .fblrp-attr-card.is-active {
   border-color: var(--fblrp-attr-color, var(--fblrp-accent));
   background: var(--fblrp-active-attr-tint, #ffffff);

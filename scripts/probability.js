@@ -63,10 +63,16 @@ export function calculateSuccessDistribution(payload = {}, { pushed = false } = 
   return cancelNegativeSuccesses(positive, negative);
 }
 
+/**
+ * Calculates the chance of at least one net success.
+ */
 export function calculateSuccessChance(payload = {}) {
   return chanceFromDistribution(calculateSuccessDistribution(payload));
 }
 
+/**
+ * Calculates current and pushed success chances and push damage risks.
+ */
 export function calculateChanceAnalysis(payload = {}) {
   const pool = normalizeDicePool(payload);
   const distribution = calculateSuccessDistribution(payload);
@@ -89,16 +95,25 @@ export function calculateChanceAnalysis(payload = {}) {
   };
 }
 
+/**
+ * Formats a probability as a localized percentage string.
+ */
 export function formatChance(chance) {
   const pct = Math.round(clamp01(Number(chance) || 0) * 1000) / 10;
   return `${Number.isInteger(pct) ? pct.toFixed(0) : pct.toFixed(1)}%`;
 }
 
+/**
+ * Formats an expected-success value for the UI.
+ */
 export function formatExpected(value) {
   const number = Math.round((Number(value) || 0) * 100) / 100;
   return Number.isInteger(number) ? number.toFixed(0) : number.toFixed(2).replace(/0$/, "");
 }
 
+/**
+ * Builds a compact human-readable description of a dice pool.
+ */
 export function describeChancePool({ base = 0, skill = 0, gear = 0, modifier = 0, artifactCounts = {} } = {}) {
   const pool = normalizeDicePool({ base, skill, gear, modifier });
   const positiveD6 = pool.base + pool.skill + pool.gear;
@@ -114,12 +129,18 @@ export function describeChancePool({ base = 0, skill = 0, gear = 0, modifier = 0
   return parts.length ? parts.join(" + ") : "0 dice";
 }
 
+/**
+ * Counts positive D6 and artifact dice in a payload.
+ */
 export function totalPositiveDiceCount(payload = {}) {
   const pool = normalizeDicePool(payload);
   return pool.base + pool.skill + pool.gear
     + ARTIFACT_DICE.reduce((sum, die) => sum + nonNegativeInteger(payload?.artifactCounts?.[die]), 0);
 }
 
+/**
+ * Counts every physical die represented by a payload.
+ */
 export function totalDiceCount(payload = {}) {
   const pool = normalizeDicePool(payload);
   return totalPositiveDiceCount(payload) + pool.negative;

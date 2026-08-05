@@ -116,3 +116,21 @@ test("footer omits reset and last quick setup actions", async () => {
   assert.match(html, /data-action="roll"/);
   assert.match(html, /data-action="cancel"/);
 });
+
+test("all editable dice inputs permit a zero value", async () => {
+  const { buildArmorShellHTML, buildShellHTML } = await import("../scripts/templates.js");
+  const skillHtml = buildShellHTML({
+    baseLabel: "Strength", skillLabel: "Might", baseValue: 4, skillValue: 3, gearValue: 2,
+    artifactValue: "d8", modifierValue: 0,
+    attrValues: { strength: 4, agility: 3, wits: 2, empathy: 2 }, selectedAttr: "strength",
+    nativeSystemModifiers: [], quickGroups: []
+  });
+  const armorHtml = buildArmorShellHTML({
+    armorValue: 4, artifactValue: "d10", nativeSystemModifiers: [], quickGroups: []
+  });
+  for (const html of [skillHtml, armorHtml]) {
+    const numericInputs = [...html.matchAll(/<input type="number"[^>]*>/g)].map(([input]) => input);
+    assert.ok(numericInputs.length > 0);
+    assert.ok(numericInputs.every((input) => /\bmin="0"/.test(input)));
+  }
+});

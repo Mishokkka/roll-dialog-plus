@@ -6,6 +6,9 @@ const LEGACY_INLINE_PROPERTIES = [
   "--fblrp-active-attr-tint"
 ];
 
+/**
+ * Applies the selected attribute theme to the shell and host window.
+ */
 export function syncAttributeTheme(shell, appWindow, attrKey = "") {
   const normalized = ATTRIBUTES.some((attribute) => attribute.key === attrKey) ? attrKey : "";
   setThemeAttribute(shell, "selectedAttr", normalized);
@@ -14,6 +17,9 @@ export function syncAttributeTheme(shell, appWindow, attrKey = "") {
   clearLegacyInlineTheme(appWindow);
 }
 
+/**
+ * Removes module-owned attribute theme state from the shell and host window.
+ */
 export function clearAttributeTheme(shell, appWindow) {
   setThemeAttribute(shell, "selectedAttr", "");
   setThemeAttribute(appWindow, "fblrpSelectedAttr", "");
