@@ -1,0 +1,79 @@
+/* Owner: GM-only probability analysis panel. */
+.fblrp-shell .fblrp-chance-panel {
+  margin-top: var(--fblrp-space-2);
+  padding: 7px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-md);
+  background: var(--fblrp-panel-tint, #ffffff);
+  font-family: var(--fblrp-font-ui);
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell .fblrp-chance-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fblrp-space-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.fblrp-shell .fblrp-chance-panel__header > span {
+  color: var(--fblrp-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.fblrp-shell .fblrp-chance-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.fblrp-shell .fblrp-chance-metrics > div,
+.fblrp-shell .fblrp-distribution > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 5px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-surface-2);
+  text-align: center;
+}
+
+.fblrp-shell .fblrp-chance-metrics span,
+.fblrp-shell .fblrp-distribution small {
+  color: var(--fblrp-muted);
+  font-size: 9px;
+  line-height: 1.05;
+}
+
+.fblrp-shell .fblrp-chance-metrics strong,
+.fblrp-shell .fblrp-distribution strong {
+  color: var(--fblrp-accent);
+  font-size: 14px;
+}
+
+.fblrp-shell .fblrp-distribution {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.fblrp-shell .fblrp-probability-limit {
+  grid-column: 1 / -1;
+}
+
+@container (max-width: 620px) {
+  .fblrp-shell .fblrp-chance-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

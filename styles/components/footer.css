@@ -1,0 +1,121 @@
+/* Owner: bottom action row and the attribute-colored ROLL action. */
+.fblrp-shell .fblrp-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  margin-top: 7px;
+  padding: 8px 1px 7px;
+  overflow: hidden;
+}
+
+.fblrp-shell .fblrp-footer-tools {
+  display: inline-flex;
+  gap: 4px;
+  justify-self: start;
+}
+
+.fblrp-shell .fblrp-footer button {
+  min-height: 38px;
+  margin: 0;
+  border: 1px solid var(--fblrp-border-strong);
+  border-radius: var(--fblrp-radius-sm);
+  cursor: pointer;
+}
+
+.fblrp-shell .fblrp-tool-button {
+  width: 38px;
+  padding: 0;
+  background: var(--fblrp-surface-1);
+}
+
+.fblrp-shell .fblrp-cancel-button {
+  justify-self: end;
+  padding: 0 14px;
+  background: var(--fblrp-panel-tint, #ffffff);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.fblrp-shell .fblrp-footer .fblrp-roll-button {
+  --fblrp-roll-wave-angle: 0deg;
+  position: relative;
+  isolation: isolate;
+  justify-self: center;
+  min-width: 148px;
+  padding: 0 25px;
+  overflow: hidden;
+  border: 2px solid var(--fblrp-current-attr, var(--fblrp-border-strong));
+  background: var(--fblrp-panel-tint, #ffffff);
+  color: color-mix(in srgb, var(--fblrp-current-attr, var(--fblrp-text)) 86%, #111111);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fblrp-shell[data-selected-attr] .fblrp-footer .fblrp-roll-button::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--fblrp-roll-wave-angle),
+    transparent 0deg 270deg,
+    color-mix(in srgb, var(--fblrp-current-attr) 35%, transparent) 286deg,
+    color-mix(in srgb, var(--fblrp-current-attr) 100%, #ffffff) 308deg,
+    color-mix(in srgb, var(--fblrp-current-attr) 45%, transparent) 330deg,
+    transparent 348deg 360deg
+  );
+  content: "";
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: fblrp-roll-border-wave 3.8s linear infinite;
+}
+
+@keyframes fblrp-roll-border-wave {
+  to { --fblrp-roll-wave-angle: 360deg; }
+}
+
+@property --fblrp-roll-wave-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fblrp-shell[data-selected-attr] .fblrp-footer .fblrp-roll-button::before {
+    animation: none;
+    background: linear-gradient(var(--fblrp-current-attr), var(--fblrp-current-attr));
+  }
+}
+
+@container (max-width: 545px) {
+  .fblrp-shell .fblrp-footer {
+    grid-template-columns: 1fr auto 1fr;
+  }
+}
+
+@container (max-width: 410px) {
+  .fblrp-shell .fblrp-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .fblrp-shell .fblrp-footer-tools {
+    justify-self: center;
+  }
+
+  .fblrp-shell .fblrp-roll-button,
+  .fblrp-shell .fblrp-cancel-button {
+    justify-self: stretch;
+  }
+}

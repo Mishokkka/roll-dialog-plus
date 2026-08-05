@@ -1,0 +1,207 @@
+/* Owner: system, quick and custom modifier rows plus the bottom toolbar. */
+.fblrp-shell .fblrp-modifiers-section {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-width: 0;
+}
+
+.fblrp-shell .fblrp-mod-block + .fblrp-mod-block {
+  margin-top: 4px;
+}
+
+.fblrp-shell .fblrp-mod-list {
+  display: grid;
+  gap: 4px;
+}
+
+.fblrp-shell .fblrp-mod-block.is-system-block .fblrp-mod-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fblrp-shell .fblrp-mod-row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 3px 6px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-surface-2);
+  color: var(--fblrp-text);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.fblrp-shell .fblrp-mod-row.is-custom {
+  grid-template-columns: 18px minmax(0, 1fr) 52px 24px;
+}
+
+.fblrp-shell .fblrp-mod-row.is-gear-bonus {
+  border-color: color-mix(in srgb, var(--fblrp-positive) 35%, var(--fblrp-border));
+  background: var(--fblrp-positive-soft);
+}
+
+.fblrp-shell .fblrp-mod-row > input[type="checkbox"],
+.fblrp-shell .fblrp-mod-row > input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--fblrp-accent);
+}
+
+.fblrp-shell .fblrp-mod-row > strong {
+  min-width: 27px;
+  color: var(--fblrp-accent);
+  text-align: right;
+}
+
+.fblrp-shell .fblrp-mod-label-wrap {
+  display: grid;
+  min-width: 0;
+}
+
+.fblrp-shell .fblrp-mod-label-wrap > span,
+.fblrp-shell .fblrp-mod-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fblrp-shell .fblrp-mod-name-input,
+.fblrp-shell .fblrp-mod-value-input {
+  width: 100%;
+  height: 23px;
+  margin: 0;
+  padding: 1px 5px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: 3px;
+  background: #ffffff;
+  color: var(--fblrp-text);
+  box-shadow: none;
+}
+
+.fblrp-shell .fblrp-mod-value-input {
+  text-align: center;
+}
+
+.fblrp-shell .fblrp-row-remove {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--fblrp-muted);
+  cursor: pointer;
+}
+
+.fblrp-shell .fblrp-row-remove:hover {
+  background: var(--fblrp-negative-soft);
+  color: var(--fblrp-negative);
+}
+
+.fblrp-shell .fblrp-modifiers-section .fblrp-custom-block {
+  margin-top: auto;
+  padding-top: 5px;
+  border-top: 1px solid var(--fblrp-border);
+}
+
+.fblrp-shell .fblrp-custom-block .fblrp-mod-list:empty {
+  display: none;
+}
+
+.fblrp-shell .fblrp-custom-block .fblrp-mod-list:not(:empty) {
+  margin-bottom: 5px;
+}
+
+.fblrp-shell .fblrp-modifier-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.fblrp-shell .fblrp-link-button,
+.fblrp-shell .fblrp-small-button,
+.fblrp-shell .fblrp-icon-button {
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fblrp-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fblrp-shell .fblrp-link-button {
+  min-height: 26px;
+  padding: 0 4px;
+}
+
+.fblrp-shell .fblrp-link-button:hover {
+  color: var(--fblrp-accent);
+}
+
+.fblrp-shell .fblrp-small-button {
+  min-height: var(--fblrp-control-h-sm);
+  padding: 0 7px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-surface-2);
+}
+
+.fblrp-shell .fblrp-small-button:hover {
+  border-color: var(--fblrp-border-strong);
+  background: var(--fblrp-panel-tint, #ffffff);
+}
+
+.fblrp-shell .fblrp-icon-button {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+}
+
+.fblrp-shell .fblrp-modifier-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  margin-left: auto;
+  padding: 0 8px;
+  border: 1px solid var(--fblrp-border-strong);
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-panel-tint, #ffffff);
+  color: var(--fblrp-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fblrp-shell .fblrp-modifier-total strong {
+  min-width: 22px;
+  color: var(--fblrp-accent);
+  font-size: 14px;
+  text-align: right;
+}
+
+.fblrp-shell .fblrp-chance-button {
+  color: var(--fblrp-accent);
+}
+
+@container (max-width: 610px) {
+  .fblrp-shell .fblrp-mod-block.is-system-block .fblrp-mod-list {
+    grid-template-columns: 1fr;
+  }
+
+  .fblrp-shell .fblrp-modifier-toolbar {
+    flex-wrap: nowrap;
+  }
+}

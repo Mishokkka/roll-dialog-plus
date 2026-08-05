@@ -1,0 +1,66 @@
+/* Owner: attribute selector strip and attribute cards. */
+.fblrp-shell .fblrp-attribute-strip {
+  margin-bottom: 5px;
+  padding: 4px;
+  border: 1px solid var(--fblrp-border);
+  border-radius: var(--fblrp-radius-md);
+  background: var(--fblrp-panel-tint, #ffffff);
+  transition: background-color 140ms ease;
+}
+
+.fblrp-shell .fblrp-attr-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.fblrp-shell .fblrp-attr-card {
+  display: grid;
+  grid-template-rows: auto auto;
+  place-items: center;
+  gap: 2px;
+  min-height: 54px;
+  margin: 0;
+  padding: 4px 6px;
+  border: 3px solid transparent;
+  border-radius: var(--fblrp-radius-sm);
+  background: var(--fblrp-panel-tint, #ffffff);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 100ms ease, background-color 140ms ease, box-shadow 100ms ease;
+}
+
+.fblrp-shell .fblrp-attr-card:hover:not(:disabled) {
+  border-color: var(--fblrp-border-strong);
+  background: var(--fblrp-surface-2);
+}
+
+.fblrp-shell .fblrp-attr-card.is-active {
+  border-color: var(--fblrp-attr-color, var(--fblrp-accent));
+  background: var(--fblrp-active-attr-tint, #ffffff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fblrp-attr-color, var(--fblrp-accent)) 72%, transparent), inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+}
+
+.fblrp-shell .fblrp-attr-card[data-attr="strength"] { --fblrp-attr-color: var(--fblrp-attr-strength); }
+.fblrp-shell .fblrp-attr-card[data-attr="agility"] { --fblrp-attr-color: var(--fblrp-attr-agility); }
+.fblrp-shell .fblrp-attr-card[data-attr="wits"] { --fblrp-attr-color: var(--fblrp-attr-wits); }
+.fblrp-shell .fblrp-attr-card[data-attr="empathy"] { --fblrp-attr-color: var(--fblrp-attr-empathy); }
+
+.fblrp-shell .fblrp-attr-short {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+}
+
+.fblrp-shell .fblrp-attr-card strong {
+  color: var(--fblrp-attr-color, var(--fblrp-text));
+  font-size: 27px;
+  line-height: 1;
+}
+
+@container (max-width: 410px) {
+  .fblrp-shell .fblrp-attr-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

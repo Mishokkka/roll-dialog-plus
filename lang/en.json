@@ -1,0 +1,207 @@
+{
+  "FBL_ROLL_DIALOG_PLUS": {
+    "Common": {
+      "Attribute": "Attribute",
+      "Dice": "Dice",
+      "Gear": "Gear",
+      "Modifiers": "Modifiers",
+      "Quick": "Quick",
+      "System": "System",
+      "Custom": "Custom",
+      "Roll": "Roll",
+      "Cancel": "Cancel",
+      "Close": "Close",
+      "Remove": "Remove",
+      "Decrease": "Decrease",
+      "Increase": "Increase",
+      "ArtifactDie": "artifact die",
+      "ArtifactDice": "Artifact dice",
+      "ArtifactDiceCount": "artifact dice count",
+      "PlusOne": "+1",
+      "PlusTwo": "+2",
+      "PlusThree": "+3",
+      "MinusOne": "−1",
+      "MinusTwo": "−2",
+      "MinusThree": "−3"
+    },
+    "Attribute": {
+      "Strength": "Strength",
+      "StrengthShort": "STR",
+      "Agility": "Agility",
+      "AgilityShort": "AGI",
+      "Wits": "Wits",
+      "WitsShort": "WITS",
+      "Empathy": "Empathy",
+      "EmpathyShort": "EMP"
+    },
+    "Dialog": {
+      "RollUses": "Roll uses",
+      "ZeroDiceWarning": "No dice: Forbidden Lands will reject this roll.",
+      "NegativeOnlyWarning": "Only negative dice remain. Success is impossible.",
+      "ZeroDiceBlocked": "The pool contains no dice. Forbidden Lands cannot submit this roll.",
+      "NativeAttribute": "The native attribute is preserved until you choose one explicitly.",
+      "SubmitFailed": "The roll could not be submitted. The dialog remains editable.",
+      "SubmitTimeout": "No roll message was created. The dialog has been unlocked."
+    },
+    "Actor": {
+      "Unknown": "Unknown actor",
+      "Approximate": "Approximate actor",
+      "ApproximateWarning": "Actor context was resolved through a compatibility fallback. Verify the displayed values."
+    },
+    "Modifiers": {
+      "CustomAndQuick": "Custom and quick",
+      "EmptyCustom": "Use Quick or add a custom modifier.",
+      "EmptySystem": "No system modifiers.",
+      "AddCustom": "Custom",
+      "ClearQuick": "Clear quick",
+      "CustomDefault": "Custom modifier",
+      "Name": "Modifier name",
+      "Value": "Modifier value",
+      "Enabled": "Enable modifier",
+      "SourceSystemActor": "System + actor",
+      "SourceActor": "Actor",
+      "SourceSystem": "System",
+      "Total": "Total modifier"
+    },
+    "Quick": {
+      "Title": "Quick modifiers",
+      "Difficulty": "Difficulty",
+      "Range": "Range",
+      "Light": "Light",
+      "HelpAndHindrance": "Help and hindrance",
+      "HelpCounter": "Net help",
+      "HelpCount": "Help ×{count}",
+      "HindranceCount": "Hindrance ×{count}",
+      "ArmorAdjustment": "Armor adjustment",
+      "Firearms": "Firearms",
+      "Trivial": "Trivial",
+      "Simple": "Simple",
+      "Easy": "Easy",
+      "Demanding": "Demanding",
+      "Hard": "Hard",
+      "Formidable": "Formidable",
+      "ArmsLengthRanged": "Arm's Length (ranged)",
+      "ArmsLengthMelee": "Arm's Length (melee)",
+      "Near": "Near",
+      "Short": "Short",
+      "Long": "Long",
+      "Distant": "Distant",
+      "Bright": "Bright",
+      "Dim": "Dim",
+      "Darkness": "Darkness",
+      "ArmorPiercingHalf": "AP ×0.5"
+    },
+    "QuickHint": {
+      "Trivial": "Trivial task",
+      "Simple": "Simple task",
+      "Easy": "Easy task",
+      "Demanding": "Demanding task",
+      "Hard": "Hard task",
+      "Formidable": "Formidable task",
+      "ArmsLengthRanged": "Ranged attack at Arm's Length",
+      "ArmsLengthMelee": "Arm's Length melee bonus when applicable",
+      "Near": "Near range",
+      "Short": "Short range",
+      "Long": "Long range",
+      "Distant": "Distant range, usually requires Aim",
+      "Bright": "Bright light",
+      "Dim": "Dim light",
+      "Darkness": "Darkness",
+      "HelpCounter": "Positive values are helpers, negative values are hindrances",
+      "AddArmorOne": "Add 1 armor die",
+      "AddArmorTwo": "Add 2 armor dice",
+      "AddArmorThree": "Add 3 armor dice",
+      "RemoveArmorOne": "Remove 1 armor die",
+      "RemoveArmorTwo": "Remove 2 armor dice",
+      "RemoveArmorThree": "Remove 3 armor dice",
+      "ArmorPiercingHalf": "Halve all rolled armor dice using the configured rounding rule"
+    },
+    "Armor": {
+      "Title": "Armor roll",
+      "GearDice": "GEAR DICE",
+      "Info": "Armor rolls use Gear dice only. Attributes and skills are ignored.",
+      "Armor": "Armor",
+      "Adjustments": "Armor adjustments",
+      "EmptyCustom": "Add a custom armor dice adjustment.",
+      "AddAdjustment": "Add armor adjustment",
+      "CustomDefault": "Armor adjustment"
+    },
+    "Chance": {
+      "Button": "Chance",
+      "Calculate": "Calculate success chance",
+      "ShowButton": "Show success chance button",
+      "Analysis": "Probability analysis",
+      "Pool": "Pool",
+      "Now": "Now",
+      "AfterPush": "After push",
+      "Expected": "Expected successes",
+      "AttributeRisk": "Attribute damage risk",
+      "GearRisk": "Gear damage risk",
+      "PreviewUnavailable": "Preview unavailable for this pool size",
+      "Unavailable": "Unavailable"
+    },
+    "Chat": {
+      "RollContext": "Roll context",
+      "OriginalAttribute": "Original attribute: {attribute}",
+      "AttributeOverride": "{selected} instead of {original}"
+    },
+    "Settings": {
+      "Enabled": {
+        "Name": "Enable FBL Roll Dialog Plus",
+        "Hint": "Replace supported Forbidden Lands roll dialogs with the enhanced manager."
+      },
+      "Debug": {
+        "Name": "Debug logging",
+        "Hint": "Write compatibility and diagnostic details to the browser console."
+      },
+      "ShowPushPreview": {
+        "Name": "Show Push preview",
+        "Hint": "Include post-Push chance and damage risks in probability analysis."
+      },
+      "ArmorRounding": {
+        "Name": "AP ×0.5 rounding",
+        "Hint": "Choose how halved armor dice are rounded.",
+        "Floor": "Round down",
+        "Ceil": "Round up",
+        "Round": "Nearest integer"
+      }
+    },
+    "SpecialRoll": {
+      "Title": "Special roll",
+      "UniqueModifiers": "Special roll modifiers",
+      "Empty": "No special roll modifiers.",
+      "HouseRule": "Table rule",
+      "Dodge": {
+        "Title": "Dodge",
+        "Info": "Roll Move. Each success cancels one success from the attack.",
+        "Posture": "After the dodge",
+        "FallProne": "Fall prone",
+        "FallProneHint": "Default rule: after dodging, the character falls prone.",
+        "RemainStanding": "Remain standing",
+        "RemainStandingHint": "Remain standing after the dodge at a −2 penalty.",
+        "AttackType": "Attack type",
+        "OtherAttack": "Other attack",
+        "OtherAttackHint": "No special Dodge modifier applies.",
+        "Slash": "Slash",
+        "SlashHint": "Dodge gains +2 against a Slash attack.",
+        "Firearm": "Firearm",
+        "FirearmHint": "Your table rule: Dodge suffers −2 against a firearm attack."
+      },
+      "Parry": {
+        "Title": "Parry",
+        "Info": "Roll Melee and the selected weapon or shield Gear Bonus. Each success cancels one success from the attack.",
+        "AttackType": "Attack type",
+        "Slash": "Slash",
+        "SlashHint": "Parrying a Slash has no additional modifier.",
+        "Stab": "Stab",
+        "StabHint": "Parrying a Stab with a weapon suffers −2.",
+        "PunchKick": "Punch / Kick",
+        "PunchKickHint": "Parrying a Punch or Kick with a weapon gains +2.",
+        "ShieldNonSlash": "Stab or Punch / Kick",
+        "ShieldNonSlashHint": "A shield gains +2 when parrying a Stab, Punch, or Kick.",
+        "OtherOrRanged": "Other or ranged attack",
+        "OtherOrRangedHint": "No attack-type modifier applies. Ranged attacks can only be parried when the rules allow it."
+      }
+    }
+  }
+}
