@@ -14,6 +14,9 @@ const ARMOR_KEYS = new Set([
   "бросок-доспеха"
 ]);
 
+/**
+ * Detects skill or armor mode from structured application and form data.
+ */
 export function detectRollType({ app = null, form = null, title = "", baseLabel = "", skillLabel = "", skillKey = "" } = {}) {
   const structured = [
     app?.options?.rollType,
@@ -37,6 +40,9 @@ export function detectRollType({ app = null, form = null, title = "", baseLabel 
   return isArmorRollTitle(title, baseLabel, skillLabel) ? "armor" : "skill";
 }
 
+/**
+ * Infers the armor die value from native roll fields and labels.
+ */
 export function inferArmorDiceValue({ base, skill, gear, baseLabel, skillLabel, title }) {
   const values = {
     base: parseNumber(base?.value, 0),
@@ -62,6 +68,9 @@ export function inferArmorDiceValue({ base, skill, gear, baseLabel, skillLabel, 
   return result;
 }
 
+/**
+ * Checks whether any supplied title identifies an armor roll.
+ */
 export function isArmorRollTitle(...values) {
   return values.map(normalizeKey).filter(Boolean).some((value) => {
     if (isArmorKey(value)) return true;

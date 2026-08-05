@@ -1,11 +1,14 @@
 {
   "name": "fbl-roll-dialog-plus",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test",
     "check": "node scripts/dev-check.mjs && node --test",
     "smoke": "node tests/browser-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20.11"
   }
 }

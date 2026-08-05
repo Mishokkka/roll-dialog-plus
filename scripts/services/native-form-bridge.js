@@ -3,7 +3,13 @@ import { dispatchNativeInput, parseNumber } from "../utils.js";
 
 const CLOSE_RESTORE_DELAY_MS = 2_000;
 
+/**
+ * Provides the public NativeFormBridge API.
+ */
 export class NativeFormBridge {
+  /**
+   * Captures native form and application state for reversible synchronization.
+   */
   constructor({ app, form, inputs, nativeSubmit, nativeCancel, nativeModifiers = [] } = {}) {
     this.app = app;
     this.form = form;
@@ -36,6 +42,9 @@ export class NativeFormBridge {
     return this.committed;
   }
 
+  /**
+   * Disables native option controls while preserving their original state.
+   */
   disableNativeOptions() {
     for (const modifier of this.nativeModifiers) {
       if (!modifier.input) continue;
@@ -44,6 +53,9 @@ export class NativeFormBridge {
     }
   }
 
+  /**
+   * Writes one native form value and emits native input events only when changed.
+   */
   setValue(name, value, { dispatch = true } = {}) {
     const input = this.inputs[name];
     if (!input) return false;
@@ -54,6 +66,9 @@ export class NativeFormBridge {
     return true;
   }
 
+  /**
+   * Synchronizes the checked state of a normalized modifier and its linked inputs.
+   */
   syncModifierCheckbox(modifier) {
     const inputs = [...new Set([modifier?.input, ...(modifier?.linkedInputs ?? [])].filter(Boolean))];
     if (!inputs.length) return false;
@@ -67,6 +82,9 @@ export class NativeFormBridge {
     return changed;
   }
 
+  /**
+   * Applies the selected attribute to the native roll handler state.
+   */
   applySelectedAttribute(attribute, value) {
     if (!attribute || !this.app?.base || typeof this.app.base !== "object") return false;
     try {
@@ -83,6 +101,9 @@ export class NativeFormBridge {
   }
 
 
+  /**
+   * Synchronizes manual Gear dice with the native roll handler.
+   */
   setNativeGearValue(value) {
     const gear = this.app?.gear;
     if (!gear || typeof gear !== "object") return false;
@@ -97,6 +118,9 @@ export class NativeFormBridge {
     }
   }
 
+  /**
+   * Creates or updates hidden native fields for active gear-bonus modifiers.
+   */
   syncSyntheticGearBonuses(modifiers = []) {
     const desired = modifiers
       .filter((modifier) => modifier.checked && modifier.gearBonus)
@@ -134,12 +158,18 @@ export class NativeFormBridge {
     return true;
   }
 
+  /**
+   * Removes every synthetic field owned by the bridge.
+   */
   removeSyntheticInputs() {
     for (const input of this.syntheticInputs.values()) input.remove();
     this.syntheticInputs.clear();
     this.syntheticSignature = "";
   }
 
+  /**
+   * Submits the native form once and reports whether the attempt was accepted.
+   */
   submit() {
     if (this.committed) return false;
     if (this.submissionAttempted) throw new Error("A roll submission is already in progress");
@@ -156,7 +186,11 @@ export class NativeFormBridge {
         return true;
       }
       const SubmitEventClass = globalThis.SubmitEvent ?? Event;
-      this.form?.dispatchEvent(new SubmitEventClass("submit", { bubbles: true, cancelable: true }));
+      const accepted = this.form?.dispatchEvent(new SubmitEventClass("submit", { bubbles: true, cancelable: true }));
+      if (accepted === false) {
+        this.markFailed();
+        return false;
+      }
       return true;
     } catch (error) {
       this.markFailed();
@@ -164,18 +198,27 @@ export class NativeFormBridge {
     }
   }
 
+  /**
+   * Marks the native submission as confirmed by a matching ChatMessage.
+   */
   markCommitted() {
     this.committed = true;
     this.submissionAttempted = false;
     this.clearCloseRestoreTimer();
   }
 
+  /**
+   * Clears an unconfirmed submission attempt so the dialog can be retried.
+   */
   markFailed() {
     if (this.committed) return;
     this.submissionAttempted = false;
     this.clearCloseRestoreTimer();
   }
 
+  /**
+   * Restores native state immediately or after the pending confirmation window.
+   */
   requestCloseRestore({ delay = CLOSE_RESTORE_DELAY_MS } = {}) {
     if (this.committed || this.restored) return;
     if (!this.submissionAttempted) {
@@ -189,6 +232,9 @@ export class NativeFormBridge {
     }, delay);
   }
 
+  /**
+   * Restores native state and delegates to the native cancel or close path.
+   */
   async cancel() {
     this.markFailed();
     this.restore();
@@ -203,6 +249,9 @@ export class NativeFormBridge {
     this.form?.closest?.(".window-app, .application")?.querySelector?.(".header-button.close, [data-action='close']")?.click?.();
   }
 
+  /**
+   * Restores all snapshotted native values, options, and application state.
+   */
   restore({ force = false } = {}) {
     if ((this.committed && !force) || this.restored) return false;
     this.clearCloseRestoreTimer();
@@ -225,12 +274,18 @@ export class NativeFormBridge {
     return true;
   }
 
+  /**
+   * Captures the native roll handler base attribute state.
+   */
   snapshotNativeBase() {
     const base = this.app?.base;
     if (!base || typeof base !== "object") return null;
     return { name: base.name, label: base.label, value: base.value };
   }
 
+  /**
+   * Restores the captured native base attribute state.
+   */
   restoreNativeBase() {
     if (!this.baseSnapshot || !this.app?.base || typeof this.app.base !== "object") return;
     try {
@@ -241,12 +296,18 @@ export class NativeFormBridge {
   }
 
 
+  /**
+   * Captures the native roll handler Gear state.
+   */
   snapshotNativeGear() {
     const gear = this.app?.gear;
     if (!gear || typeof gear !== "object") return null;
     return { value: gear.value };
   }
 
+  /**
+   * Restores the captured native Gear state.
+   */
   restoreNativeGear() {
     if (!this.gearSnapshot || !this.app?.gear || typeof this.app.gear !== "object") return;
     try {
@@ -256,6 +317,9 @@ export class NativeFormBridge {
     }
   }
 
+  /**
+   * Cancels a scheduled close restoration timer.
+   */
   clearCloseRestoreTimer() {
     if (this.closeRestoreTimer == null) return;
     globalThis.clearTimeout?.(this.closeRestoreTimer);

@@ -1,13 +1,14 @@
-import { SUBMISSION_TIMEOUT_MS } from "./submission-tracker.js";
+import { ROLL_SUBMISSION_TIMEOUT_MS } from "../constants.js";
 
 /**
  * Restores native form state for every Foundry close path until the roll is
  * confirmed by a matching ChatMessage. The cleanup function is idempotent.
  */
 export function installLifecycleRestoration({ app, appWindow, form, shell, bridge } = {}) {
+  form?._fblrpLifecycleCleanup?.();
   let cleaned = false;
   const closeButton = appWindow?.querySelector?.(".header-button.close, [data-action='close']");
-  const onCloseIntent = () => bridge?.requestCloseRestore?.({ delay: SUBMISSION_TIMEOUT_MS });
+  const onCloseIntent = () => bridge?.requestCloseRestore?.({ delay: ROLL_SUBMISSION_TIMEOUT_MS });
   closeButton?.addEventListener?.("click", onCloseIntent, { capture: true });
 
   const hookIds = [];
@@ -15,7 +16,7 @@ export function installLifecycleRestoration({ app, appWindow, form, shell, bridg
     if (!globalThis.Hooks?.on) return;
     const id = Hooks.on(name, (closedApp) => {
       if (closedApp !== app) return;
-      bridge?.requestCloseRestore?.({ delay: SUBMISSION_TIMEOUT_MS });
+      bridge?.requestCloseRestore?.({ delay: ROLL_SUBMISSION_TIMEOUT_MS });
       cleanup();
     });
     hookIds.push([name, id]);
@@ -28,7 +29,7 @@ export function installLifecycleRestoration({ app, appWindow, form, shell, bridg
   if (app && typeof app.close === "function" && !app.__fblrpCloseWrapped) {
     originalClose = app.close;
     wrappedClose = function fblrpCloseWrapper(...args) {
-      bridge?.requestCloseRestore?.({ delay: SUBMISSION_TIMEOUT_MS });
+      bridge?.requestCloseRestore?.({ delay: ROLL_SUBMISSION_TIMEOUT_MS });
       return originalClose.apply(this, args);
     };
     app.close = wrappedClose;
@@ -38,7 +39,7 @@ export function installLifecycleRestoration({ app, appWindow, form, shell, bridg
   const observer = typeof MutationObserver === "function" && appWindow?.parentNode
     ? new MutationObserver(() => {
         if (appWindow.isConnected) return;
-        bridge?.requestCloseRestore?.({ delay: SUBMISSION_TIMEOUT_MS });
+        bridge?.requestCloseRestore?.({ delay: ROLL_SUBMISSION_TIMEOUT_MS });
         cleanup();
       })
     : null;

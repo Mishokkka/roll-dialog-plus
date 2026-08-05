@@ -5,7 +5,7 @@ import process from "node:process";
 
 const root = process.cwd();
 const errors = [];
-const expectedVersion = "0.7.0";
+const expectedVersion = "0.7.1";
 const moduleJson = JSON.parse(await readFile(path.join(root, "module.json"), "utf8"));
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 const constantsSource = await readFile(path.join(root, "scripts/constants.js"), "utf8");

@@ -1,9 +1,12 @@
+import { ROLL_SUBMISSION_TIMEOUT_MS } from "./constants.js";
 import { normalizeKey } from "./utils.js";
 
 const pendingByUser = new Map();
-const TTL_MS = 30_000;
 const MAX_PENDING_PER_USER = 10;
 
+/**
+ * Queues normalized context for a pending native roll submission.
+ */
 export function setPendingRollContext(context) {
   const userId = context?.userId ?? globalThis.game?.user?.id ?? "anonymous";
   const queue = pendingByUser.get(userId) ?? [];
@@ -20,6 +23,9 @@ export function setPendingRollContext(context) {
   return entry.nonce;
 }
 
+/**
+ * Consumes the best metadata-matched pending context for a roll message.
+ */
 export function consumePendingRollContext(metadata = {}) {
   const key = metadata.userId ?? globalThis.game?.user?.id ?? "anonymous";
   const queue = pendingByUser.get(key);
@@ -48,6 +54,9 @@ export function consumePendingRollContext(metadata = {}) {
   return context ?? null;
 }
 
+/**
+ * Discards one pending context by nonce.
+ */
 export function discardPendingRollContext(nonce, userId = globalThis.game?.user?.id ?? "anonymous") {
   if (!nonce) return;
   const queue = pendingByUser.get(userId);
@@ -57,6 +66,9 @@ export function discardPendingRollContext(nonce, userId = globalThis.game?.user?
   if (!queue.length) pendingByUser.delete(userId);
 }
 
+/**
+ * Removes expired pending roll contexts for every user.
+ */
 export function clearExpiredRollContexts() {
   for (const [userId, queue] of pendingByUser) {
     prune(queue);
@@ -64,6 +76,9 @@ export function clearExpiredRollContexts() {
   }
 }
 
+/**
+ * Scores how closely a pending context matches roll message metadata.
+ */
 export function scorePendingContext(context, metadata = {}) {
   return scoreContext(context, metadata);
 }
@@ -110,7 +125,7 @@ function comparableValues(value) {
 }
 
 function prune(queue) {
-  const cutoff = Date.now() - TTL_MS;
+  const cutoff = Date.now() - ROLL_SUBMISSION_TIMEOUT_MS;
   while (queue.length && queue[0].createdAt < cutoff) queue.shift();
 }
 

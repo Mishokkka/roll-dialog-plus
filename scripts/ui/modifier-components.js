@@ -2,6 +2,9 @@ import { localize } from "../core/i18n.js";
 import { partitionSpecialModifiers } from "../services/special-rolls.js";
 import { escapeHtml, parseNumber, signed } from "../utils.js";
 
+/**
+ * Builds native and special modifier markup blocks.
+ */
 export function buildModifierBlocks(modifiers = [], specialRoll = null) {
   const { special, ordinary } = partitionSpecialModifiers(modifiers);
   const specialBlock = specialRoll && special.length
@@ -15,17 +18,26 @@ export function buildModifierBlocks(modifiers = [], specialRoll = null) {
   return `${specialBlock}${ordinaryBlock}`;
 }
 
+/**
+ * Renders the native modifier list into its owner element.
+ */
 export function renderNativeModifierList(list, modifiers = []) {
   if (!list) return;
   list.innerHTML = modifiers.length ? buildNativeModifierRows(modifiers) : "";
   list.closest(".is-system-block")?.classList.toggle("is-hidden", !modifiers.length);
 }
 
+/**
+ * Renders special-roll modifier choices into their owner element.
+ */
 export function renderSpecialModifierList(list, modifiers = []) {
   if (!list) return;
   list.innerHTML = modifiers.length ? buildSpecialModifierRows(modifiers) : "";
 }
 
+/**
+ * Renders custom and quick modifiers into their owner element.
+ */
 export function renderCustomModifierList(list, modifiers) {
   if (!list) return;
   const values = modifiers instanceof Map ? [...modifiers.values()] : [...(modifiers ?? [])];
@@ -36,11 +48,16 @@ export function renderCustomModifierList(list, modifiers) {
   list.innerHTML = values.map((modifier) => buildCustomModifierRow(modifier)).join("");
 }
 
+/**
+ * Builds markup for native modifier rows.
+ */
 export function buildNativeModifierRows(modifiers = []) {
-  if (!modifiers.length) return `<div class="fblrp-empty-note">${escapeHtml(localize("Modifiers.EmptySystem", "No system modifiers."))}</div>`;
   return modifiers.map((modifier) => buildNativeModifierRow(modifier)).join("");
 }
 
+/**
+ * Builds markup for special-roll modifier rows.
+ */
 export function buildSpecialModifierRows(modifiers = []) {
   const groups = new Map();
   for (const modifier of modifiers) {
@@ -56,6 +73,9 @@ export function buildSpecialModifierRows(modifiers = []) {
     </fieldset>`).join("");
 }
 
+/**
+ * Builds one normalized native or special modifier row.
+ */
 export function buildNativeModifierRow(modifier, special = false) {
   const inputType = modifier.choiceGroup ? "radio" : "checkbox";
   const inputName = modifier.choiceGroup ? ` name="fblrp-${escapeHtml(modifier.specialRollKey ?? "special")}-${escapeHtml(modifier.choiceGroup)}"` : "";
@@ -70,6 +90,9 @@ export function buildNativeModifierRow(modifier, special = false) {
     </label>`;
 }
 
+/**
+ * Builds one editable custom modifier row.
+ */
 export function buildCustomModifierRow(modifier) {
   const quick = modifier.origin === "quick";
   const multiplier = modifier.kind === "armor-half";

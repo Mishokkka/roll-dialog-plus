@@ -4,6 +4,9 @@ import { parseArtifactDice } from "./modifiers.js";
 import { buildModifierBlocks } from "./ui/modifier-components.js";
 import { escapeHtml, parseNumber, signed } from "./utils.js";
 
+/**
+ * Builds the Quick modifier panel markup.
+ */
 export function buildQuickModifierHTML(groups = []) {
   return groups.map((group) => {
     const expanded = group.initiallyExpanded !== false;
@@ -60,6 +63,9 @@ export function buildQuickModifierHTML(groups = []) {
   }).join("");
 }
 
+/**
+ * Builds the skill and special-roll dialog shell markup.
+ */
 export function buildShellHTML({
   baseLabel,
   skillLabel,
@@ -120,6 +126,9 @@ export function buildShellHTML({
     </div>`;
 }
 
+/**
+ * Builds the armor-roll dialog shell markup.
+ */
 export function buildArmorShellHTML({
   armorValue,
   artifactValue,
@@ -135,7 +144,7 @@ export function buildArmorShellHTML({
       <main class="fblrp-two-columns fblrp-armor-columns">
         <section class="fblrp-section fblrp-dice-section">
           <div class="fblrp-section-title"><span>${escapeHtml(localize("Armor.Title", "Armor roll"))}</span></div>
-          ${buildDiceRow("armor", localize("Armor.Armor", "Armor"), armorValue, true)}
+          ${buildDiceRow("armor", localize("Armor.Armor", "Armor"), armorValue)}
           ${buildArtifactSection(artifactCounts)}
         </section>
 
@@ -181,13 +190,13 @@ function buildFooterHTML(canUseChance = false) {
     </footer>`;
 }
 
-function buildDiceRow(name, label, value, clamp = false) {
+function buildDiceRow(name, label, value) {
   return `
     <div class="fblrp-dice-row" data-dice-row="${escapeHtml(name)}">
       <label data-field="${escapeHtml(name)}-label">${escapeHtml(label)}</label>
       <div class="fblrp-stepper">
         <button type="button" data-action="step" data-target="${escapeHtml(name)}" data-delta="-1" aria-label="${escapeHtml(localize("Common.Decrease", "Decrease"))}"><i class="fa-solid fa-minus"></i></button>
-        <input type="number" min="${clamp ? "0" : "0"}" step="1" inputmode="numeric" data-input="${escapeHtml(name)}" value="${Math.max(0, parseNumber(value, 0))}">
+        <input type="number" min="0" step="1" inputmode="numeric" data-input="${escapeHtml(name)}" value="${Math.max(0, parseNumber(value, 0))}">
         <button type="button" data-action="step" data-target="${escapeHtml(name)}" data-delta="1" aria-label="${escapeHtml(localize("Common.Increase", "Increase"))}"><i class="fa-solid fa-plus"></i></button>
       </div>
     </div>`;

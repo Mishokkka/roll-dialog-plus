@@ -39,6 +39,7 @@
 
 .fblrp-shell .fblrp-footer .fblrp-roll-button {
   --fblrp-roll-wave-angle: 0deg;
+
   position: relative;
   isolation: isolate;
   justify-self: center;

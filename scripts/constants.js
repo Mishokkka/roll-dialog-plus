@@ -1,6 +1,7 @@
 export const MODULE_ID = "fbl-roll-dialog-plus";
-export const MODULE_VERSION = "0.7.0";
+export const MODULE_VERSION = "0.7.1";
 export const SYSTEM_ID = "forbidden-lands";
+export const ROLL_SUBMISSION_TIMEOUT_MS = 30_000;
 
 export const ATTRIBUTES = [
   {

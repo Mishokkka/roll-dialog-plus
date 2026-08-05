@@ -1,6 +1,9 @@
 import { activeNumericModifierSum } from "../modifiers.js";
 import { parseNumber } from "../utils.js";
 
+/**
+ * Sums active custom modifiers while optionally excluding modifier kinds.
+ */
 export function activeCustomModifierSum(modifiers = [], { excludeKinds = [] } = {}) {
   const values = modifiers instanceof Map ? [...modifiers.values()] : [...modifiers];
   const excluded = new Set(excludeKinds);
@@ -10,6 +13,9 @@ export function activeCustomModifierSum(modifiers = [], { excludeKinds = [] } = 
   }, 0);
 }
 
+/**
+ * Sums active gear-bonus modifiers.
+ */
 export function activeGearBonusTotal(modifiers = []) {
   return modifiers.reduce((sum, modifier) => {
     if (!modifier?.checked || !modifier.gearBonus) return sum;
@@ -17,12 +23,18 @@ export function activeGearBonusTotal(modifiers = []) {
   }, 0);
 }
 
+/**
+ * Calculates the final skill modifier from residual, system, and custom sources.
+ */
 export function calculateSkillModifierTotal({ residual = 0, systemModifiers = [], customModifiers = [] } = {}) {
   return parseNumber(residual, 0)
     + activeNumericModifierSum(systemModifiers)
     + activeCustomModifierSum(customModifiers);
 }
 
+/**
+ * Calculates final armor dice after modifiers, factors, and configured rounding.
+ */
 export function calculateArmorDiceTotal({
   armor = 0,
   residual = 0,

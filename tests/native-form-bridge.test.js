@@ -87,3 +87,25 @@ test("native Gear state remains changed after a confirmed submission", () => {
   assert.equal(bridge.restore(), false);
   assert.equal(app.gear.value, 1);
 });
+
+test("committed bridges return false without invoking native submission", () => {
+  const { form, bridge } = makeFixture();
+  bridge.markCommitted();
+  assert.equal(bridge.submit(), false);
+  assert.equal(form.submitted, 0);
+});
+
+test("a second submission while confirmation is pending throws", () => {
+  const { bridge } = makeFixture();
+  assert.equal(bridge.submit(), true);
+  assert.throws(() => bridge.submit(), /already in progress/);
+});
+
+test("a canceled fallback submit event returns false and clears the in-progress guard", () => {
+  const form = {
+    dispatchEvent() { return false; }
+  };
+  const bridge = new NativeFormBridge({ form, inputs: {} });
+  assert.equal(bridge.submit(), false);
+  assert.equal(bridge.submissionAttempted, false);
+});

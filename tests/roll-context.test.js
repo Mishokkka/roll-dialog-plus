@@ -89,3 +89,14 @@ test("parallel dialogs for one actor are matched by item, skill, attribute and t
   });
   assert.equal(parry.marker, "parry");
 });
+
+test("pending context queues retain only the ten newest entries per user", () => {
+  for (let index = 0; index < 11; index += 1) {
+    setPendingRollContext({ userId: "bounded-user", actorId: `actor-${index}`, marker: index });
+  }
+  assert.equal(consumePendingRollContext({ userId: "bounded-user", actorId: "actor-0" }), null);
+  assert.equal(consumePendingRollContext({ userId: "bounded-user", actorId: "actor-10" })?.marker, 10);
+  for (let index = 1; index < 10; index += 1) {
+    consumePendingRollContext({ userId: "bounded-user", actorId: `actor-${index}` });
+  }
+});

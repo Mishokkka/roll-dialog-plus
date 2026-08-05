@@ -1,14 +1,26 @@
 import { ARMOR_QUICK_MODIFIERS, QUICK_MODIFIERS } from "../constants.js";
+import { log } from "../core/logging.js";
 
 const registries = {
   skill: structuredCloneSafe(QUICK_MODIFIERS),
   armor: structuredCloneSafe(ARMOR_QUICK_MODIFIERS)
 };
 
+/**
+ * Returns an isolated copy of the requested Quick modifier registry.
+ */
 export function getQuickModifierGroups(type = "skill") {
-  return structuredCloneSafe(registries[type] ?? registries.skill);
+  const groups = registries[type];
+  if (!groups) {
+    log.warn(`Unknown quick modifier registry type '${type}', falling back to 'skill'`);
+    return structuredCloneSafe(registries.skill);
+  }
+  return structuredCloneSafe(groups);
 }
 
+/**
+ * Registers or replaces a Quick modifier group for an integration type.
+ */
 export function registerQuickModifierGroup(group, { type = "skill", replace = false } = {}) {
   if (!group?.key) throw new Error("Quick modifier group requires a key");
   const target = registries[type] ??= [];

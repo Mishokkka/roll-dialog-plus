@@ -7,6 +7,9 @@ export const SETTINGS = Object.freeze({
   ARMOR_ROUNDING: "armorRounding"
 });
 
+/**
+ * Registers the module settings used by the roll dialog.
+ */
 export function registerSettings() {
   const register = (key, data) => game.settings.register(MODULE_ID, key, data);
 
@@ -53,6 +56,9 @@ export function registerSettings() {
   });
 }
 
+/**
+ * Reads a module setting and returns a fallback when Foundry is unavailable.
+ */
 export function getSetting(name, fallback = undefined) {
   try {
     if (!globalThis.game?.settings?.get) return fallback;

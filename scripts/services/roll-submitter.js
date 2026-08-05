@@ -19,6 +19,8 @@ export function submitNativeRoll({
   setSubmittingUi,
   failureLog = "Roll submission failed"
 } = {}) {
+  if (bridge?.committed) return false;
+
   const hookPayload = { app, form, actor, payload, context };
   if (!callCancelableHook("fblRollDialogPlusBeforeRoll", hookPayload)) return false;
 
@@ -34,25 +36,35 @@ export function submitNativeRoll({
   });
 
   try {
-    bridge.submit();
+    const submitted = bridge.submit();
+    if (submitted === false) {
+      rollbackPendingSubmission({ state, bridge, shell, nonce, setSubmittingUi });
+      return false;
+    }
     callHook("fblRollDialogPlusSubmissionAttempted", {
       ...hookPayload,
       context: { ...context, nonce }
     });
     return true;
   } catch (error) {
-    state.submissionCleanup?.();
-    state.submissionCleanup = null;
-    discardPendingRollContext(nonce);
-    bridge.markFailed();
-    state.isSubmitting = false;
-    setSubmittingUi(shell, false);
+    rollbackPendingSubmission({ state, bridge, shell, nonce, setSubmittingUi });
     log.error(failureLog, error);
     globalThis.ui?.notifications?.error?.(
       localize("Dialog.SubmitFailed", "The roll could not be submitted. The dialog remains editable.")
     );
     return false;
   }
+}
+
+function rollbackPendingSubmission({ state, bridge, shell, nonce, setSubmittingUi }) {
+  state?.submissionCleanup?.();
+  if (state) {
+    state.submissionCleanup = null;
+    state.isSubmitting = false;
+  }
+  discardPendingRollContext(nonce);
+  bridge?.markFailed?.();
+  setSubmittingUi?.(shell, false);
 }
 
 function callHook(name, payload) {

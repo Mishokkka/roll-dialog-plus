@@ -43,6 +43,15 @@
   cursor: pointer;
 }
 
+.fblrp-shell .fblrp-stepper button:focus-visible,
+.fblrp-shell .fblrp-stepper input:focus-visible,
+.fblrp-shell .fblrp-artifact-die input:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--fblrp-accent);
+  outline-offset: -2px;
+}
+
 .fblrp-shell .fblrp-stepper input,
 .fblrp-shell .fblrp-artifact-die input {
   width: 100%;

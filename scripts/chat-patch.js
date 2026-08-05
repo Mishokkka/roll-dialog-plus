@@ -25,6 +25,9 @@ export function attachRollContextFlag(message, data, _options, userId) {
   globalThis.Hooks?.callAll?.("fblRollDialogPlusRollSubmitted", result);
 }
 
+/**
+ * Extracts matching metadata from a Foundry roll ChatMessage.
+ */
 export function extractRollMessageMetadata(message, data, userId = null) {
   const roll = data?.rolls?.[0] ?? message?.rolls?.[0] ?? data?.roll ?? message?.roll ?? null;
   const options = roll?.options ?? roll?._options ?? data?.rollOptions ?? {};
@@ -43,11 +46,7 @@ export function extractRollMessageMetadata(message, data, userId = null) {
 }
 
 function isRollMessage(message, data) {
-  const rollType = globalThis.CONST?.CHAT_MESSAGE_TYPES?.ROLL;
   if ((data?.rolls?.length ?? 0) > 0 || (message?.rolls?.length ?? 0) > 0) return true;
   if (data?.roll || message?.roll) return true;
-  if (rollType != null && (data?.type === rollType || message?.type === rollType)) return true;
-  if (message?.isRoll === true) return true;
-  const content = String(data?.content ?? message?.content ?? "");
-  return /dice-roll|dice-tooltip|yzur|yearzero/i.test(content);
+  return false;
 }
