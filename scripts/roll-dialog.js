@@ -809,6 +809,10 @@ function createSharedRollController({ state, shell, ui, bridge, renderArtifactDi
     const modifier = state.customModifiers.get(id);
     if (!modifier) return;
     state.customModifiers.delete(id);
+    if (modifier.origin === "quick" && modifier.kind === "counter" && modifier.groupKey) {
+      state.quickCounters.delete(modifier.groupKey);
+      updateCounterUi(shell, modifier.groupKey, 0);
+    }
     shell.querySelector(`[data-action="quick-mod"][data-id="${cssEscape(id)}"]`)?.classList.remove("is-active");
     renderCustomModifiers();
     updateTotals();

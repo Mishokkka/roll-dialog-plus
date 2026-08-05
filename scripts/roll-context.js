@@ -36,7 +36,7 @@ export function consumePendingRollContext(metadata = {}) {
     return null;
   }
 
-  const candidates = actorCandidates(queue, metadata.actorId);
+  const candidates = matchingCandidates(queue, metadata);
   if (!candidates.length) return null;
 
   let best = candidates[0];
@@ -83,15 +83,41 @@ export function scorePendingContext(context, metadata = {}) {
   return scoreContext(context, metadata);
 }
 
-function actorCandidates(queue, actorId) {
-  if (actorId) {
-    const exact = queue.map((_entry, index) => index).filter((index) => sameValue(queue[index].actorId, actorId));
-    if (exact.length) return exact;
-    return queue.map((_entry, index) => index).filter((index) => !queue[index].actorId);
+/**
+ * Narrows pending contexts by the strongest available actor or token identity.
+ */
+function matchingCandidates(queue, metadata) {
+  const indexes = queue.map((_entry, index) => index);
+
+  if (metadata.tokenId) {
+    const exactSceneToken = indexes.filter((index) => {
+      const context = queue[index];
+      return sameValue(context.tokenId, metadata.tokenId)
+        && context.sceneId
+        && metadata.sceneId
+        && sameValue(context.sceneId, metadata.sceneId);
+    });
+    if (exactSceneToken.length) return exactSceneToken;
+
+    const exactToken = indexes.filter((index) => {
+      const context = queue[index];
+      if (!sameValue(context.tokenId, metadata.tokenId)) return false;
+      return !context.sceneId || !metadata.sceneId || sameValue(context.sceneId, metadata.sceneId);
+    });
+    if (exactToken.length) return exactToken;
   }
-  return queue.map((_entry, index) => index).filter((index) => !queue[index].actorId);
+
+  if (metadata.actorId) {
+    const exactActor = indexes.filter((index) => sameValue(queue[index].actorId, metadata.actorId));
+    if (exactActor.length) return exactActor;
+  }
+
+  return indexes.filter((index) => !queue[index].actorId && !queue[index].tokenId);
 }
 
+/**
+ * Scores secondary roll metadata after identity-based candidate narrowing.
+ */
 function scoreContext(context, metadata) {
   let score = 0;
   score += compareField(context.actorId, metadata.actorId, 100, -100);

@@ -141,6 +141,39 @@ test("official data-id is used as the native modifier source identity", () => {
   assert.deepEqual(modifier.artifactCounts, { d8: 1, d10: 0, d12: 0 });
 });
 
+test("native Gear modifier display uses module localization", (t) => {
+  const previousGame = globalThis.game;
+  globalThis.game = {
+    i18n: {
+      localize(key) {
+        return key.endsWith("Common.Gear") ? "Снаряжение" : key;
+      }
+    }
+  };
+  t.after(() => {
+    if (previousGame === undefined) delete globalThis.game;
+    else globalThis.game = previousGame;
+  });
+
+  const row = { textContent: "Fine tool +2", dataset: {}, title: "", parentElement: null };
+  const input = {
+    checked: true,
+    disabled: false,
+    name: "true_Fine tool_2",
+    value: "2",
+    title: "",
+    dataset: { gearBonus: "true" },
+    closest() { return row; }
+  };
+  const form = {
+    querySelectorAll(selector) {
+      return selector === ".options input[type='checkbox']" ? [input] : [];
+    }
+  };
+
+  assert.equal(readNativeSystemModifiers(form)[0].display, "Снаряжение +2");
+});
+
 test("merged linked input arrays are cloned instead of shared with hook consumers", () => {
   const linkedInputs = [{ checked: false }];
   const [merged] = mergeSystemModifiers([{

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   getActorAttributeValues,
   inferCurrentAttribute,
+  inferSkillKey,
   readActorRollModifiersByIdentifiers,
   resolveActorFromApp,
   resolveCurrentAttributeKey
@@ -104,4 +105,66 @@ test("speaker token remains a precise actor source", (t) => {
   const resolution = resolveActorFromApp({ speaker: { token: "token-a" } }, { dataset: {} });
   assert.equal(resolution.actor, actor);
   assert.equal(resolution.source, "speaker.token");
+});
+
+test("speaker token actor wins over the base world actor", (t) => {
+  restoreGlobal(t, "canvas");
+  restoreGlobal(t, "game");
+  const baseActor = { documentName: "Actor", id: "actor-a", name: "Base" };
+  const syntheticActor = { documentName: "Actor", id: "actor-a", name: "Synthetic" };
+  globalThis.canvas = { tokens: { get(id) { return id === "token-a" ? { actor: syntheticActor } : null; } } };
+  globalThis.game = { actors: { get(id) { return id === "actor-a" ? baseActor : null; } } };
+
+  const resolution = resolveActorFromApp({ speaker: { actor: "actor-a", token: "token-a" } }, { dataset: {} });
+  assert.equal(resolution.actor, syntheticActor);
+  assert.equal(resolution.source, "speaker.token");
+});
+
+test("off-canvas scene tokens can resolve their synthetic actor", (t) => {
+  restoreGlobal(t, "canvas");
+  restoreGlobal(t, "game");
+  const actor = { documentName: "Actor", id: "actor-scene" };
+  globalThis.canvas = { tokens: { get() { return null; } } };
+  globalThis.game = {
+    scenes: {
+      get(id) {
+        return id === "scene-a" ? { tokens: { get(tokenId) { return tokenId === "token-a" ? { actor } : null; } } } : null;
+      }
+    },
+    actors: { get() { return null; } }
+  };
+
+  const resolution = resolveActorFromApp({ speaker: { scene: "scene-a", token: "token-a" } }, { dataset: {} });
+  assert.equal(resolution.actor, actor);
+  assert.equal(resolution.source, "scene.token");
+});
+
+test("prototype property names never escape the skill-label lookup", () => {
+  assert.equal(inferSkillKey(null, "constructor"), "constructor");
+  assert.equal(inferSkillKey(null, "__proto__"), "proto");
+});
+
+test("an explicitly named off-canvas scene is not confused with the active canvas token", (t) => {
+  restoreGlobal(t, "canvas");
+  restoreGlobal(t, "game");
+  const canvasActor = { documentName: "Actor", id: "canvas-actor" };
+  const sceneActor = { documentName: "Actor", id: "scene-actor" };
+  globalThis.canvas = {
+    scene: { id: "scene-active" },
+    tokens: { get(id) { return id === "shared-token-id" ? { actor: canvasActor } : null; } }
+  };
+  globalThis.game = {
+    scenes: {
+      get(id) {
+        return id === "scene-off-canvas"
+          ? { tokens: { get(tokenId) { return tokenId === "shared-token-id" ? { actor: sceneActor } : null; } } }
+          : null;
+      }
+    },
+    actors: { get() { return null; } }
+  };
+
+  const resolution = resolveActorFromApp({ speaker: { scene: "scene-off-canvas", token: "shared-token-id" } }, { dataset: {} });
+  assert.equal(resolution.actor, sceneActor);
+  assert.equal(resolution.source, "scene.token");
 });
